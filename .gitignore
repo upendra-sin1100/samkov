@@ -1,0 +1,45 @@
+# Dependencies and generated builds
+node_modules/
+.next/
+.next-dev/
+.next-production/
+out/
+dist/
+build/
+*.tsbuildinfo
+next-env.d.ts
+# Local configuration; commit only sanitized examples
+.env
+.env.*
+!.env.example
+.envrc
+# Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+# Backups, uploads, credentials, and local data
+backups/
+backend/uploads/
+*.log
+*.pem
+*.key
+*.p12
+*.pfx
+*.sqlite*
+*.db
+# Local tooling and operating-system files
+.codex/
+.agents/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+playwright-report/
+test-results/
