@@ -7,7 +7,6 @@ import re
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from uuid import UUID
-from urllib.parse import urlparse
 import httpx
 import qrcode
 import qrcode.image.svg
@@ -16,7 +15,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, FileResponse
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
-from .security import level_unlocked, secure_url
+from .security import level_unlocked, secure_url, project_url
 
 load_dotenv(Path(__file__).resolve().parent / '.env')
 load_dotenv(Path(__file__).resolve().parents[1] / '.env.local')
@@ -26,6 +25,7 @@ app.add_middleware(CORSMiddleware, allow_origins=[SITE_URL], allow_methods=['GET
 
 from .db import database, record_visit, touch_user, analytics_snapshot
 from .auth import identity
+from .directory import sync_directory
 from . import files
 
 @app.exception_handler(HTTPException)
@@ -45,11 +45,12 @@ class ApplicationInput(BaseModel):
     motivation:str=Field(min_length=30,max_length=1500)
     start_date:date
 class SubmissionInput(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
     application_id:UUID
     project_index:int=Field(ge=0,le=100)
     github_url:str=Field(max_length=1000)
-    live_url:str|None=None
-    linkedin_url:str|None=None
+    live_url:str|None=Field(default=None,max_length=2000)
+    linkedin_url:str|None=Field(default=None,max_length=2000)
     notes:str=Field(min_length=30,max_length=5000)
     attachment:str|None=Field(default=None,max_length=500)
 class ReviewInput(BaseModel):
@@ -115,11 +116,17 @@ async def platform(request:Request):
         return await asyncio.to_thread(analytics_snapshot)
     if action=='workspace':
         data={}
+        if admin:
+            try:
+                await asyncio.to_thread(sync_directory)
+            except Exception:
+                # Keep local accounts usable during upstream outages. No secrets in logs or responses.
+                data['account_sync_error']='Account sync unavailable. Showing saved accounts; retry shortly.'
         for table in ['applications','submissions','certificates']:
             data[table]=await database(table,params={} if admin else {'user_id':'eq.'+user['id']})
         data['resources']=await database('resources')
         data['isAdmin']=admin
-        if admin: data['users']=await database('profiles',params={'select':'id,email,role,disabled'})
+        if admin: data['users']=await database('profiles',params={'select':'id,email,display_name,username,role,disabled'})
         return data
     if action=='apply':
         p=ApplicationInput.model_validate(b)
@@ -128,10 +135,9 @@ async def platform(request:Request):
         await database('applications','POST',body={'user_id':user['id'],'track_slug':p.track_slug,'student_name':p.name.strip(),'college':p.college.strip(),'motivation':p.motivation.strip(),'start_date':str(p.start_date)})
     elif action=='submit':
         p=SubmissionInput.model_validate(b)
-        secure_url(p.github_url,{'github.com'})
-        if not re.fullmatch(r'/[A-Za-z0-9-]+/[A-Za-z0-9_.-]+/?', urlparse(p.github_url).path): raise HTTPException(422,'Provide a GitHub repository URL.')
-        if p.live_url: secure_url(p.live_url)
-        if p.linkedin_url: secure_url(p.linkedin_url,{'linkedin.com','www.linkedin.com'})
+        project_url(p.github_url)
+        if p.live_url: project_url(p.live_url)
+        if p.linkedin_url: project_url(p.linkedin_url)
         a=await own_application(str(p.application_id))
         if a['status']!='approved': raise HTTPException(409,'An approved, active internship is required.')
         t=await database('tracks',params={'slug':'eq.'+a['track_slug']},one=True)

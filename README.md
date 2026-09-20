@@ -65,6 +65,8 @@ Eight initial tracks, curated course links, three project levels, application re
 
 ## Deployment
 
+Follow [Vercel + Railway deployment](docs/deploy-vercel-railway.md) for the exact host settings, environment variables, database migration, administrator setup, and upload storage configuration.
+
 Host `frontend/` as the Next.js app and `backend/` as a Python service. Set `PYTHON_API_URL` before building the frontend. Keep database credentials, file credentials, and payment secrets on the backend. Neon stores structured records; upload binaries use a private bucket or persistent backend disk, not database space. The backend pool opens at most four connections per worker.
 
 No cloud accounts or live payment credentials are provisioned by this repository. Verify real Clerk login, Neon connectivity, uploads, and free certificate issuance before enabling a live program.

@@ -5,7 +5,7 @@ const config = {
       {
         source: '/api/:path*',
         destination:
-          (process.env.PYTHON_API_URL || 'http://127.0.0.1:8000') +
+          (process.env.PYTHON_API_URL || 'http://127.0.0.1:8000').replace(/\/+$/, '') +
           '/api/:path*',
       },
     ];

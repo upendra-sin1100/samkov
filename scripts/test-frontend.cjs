@@ -1,6 +1,18 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const ts = require('typescript');
+const directoryModule = {exports:{}};
+const directorySource = ts.transpileModule(fs.readFileSync('frontend/app/admin-directory.js','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
+new Function('module','exports',directorySource)(directoryModule,directoryModule.exports);
+const entries = directoryModule.exports.directoryEntries({
+ users:[{id:'new',username:'newlearner',email:'new@example.com'}, {id:'enrolled',display_name:'Current name'}],
+ applications:[{id:'application',user_id:'enrolled',student_name:'Old name',track_slug:'python'}]
+});
+assert.equal(entries.length,2);
+assert.equal(entries.find(row=>row.user_id==='new').status,'Not enrolled');
+assert.equal(entries.find(row=>row.user_id==='new').student_name,'newlearner');
+assert.equal(entries.find(row=>row.user_id==='enrolled').student_name,'Current name');
+assert.equal(directoryModule.exports.directoryEntries({applications:[]}).length,0);
 const moduleResult = {exports:{}};
 const source = fs.readFileSync('frontend/app/workspace-state.js','utf8');
 const compiled = ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;

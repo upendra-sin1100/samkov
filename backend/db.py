@@ -16,7 +16,7 @@ from psycopg.types.json import Jsonb
 from psycopg_pool import ConnectionPool, PoolTimeout
 
 TABLES = {
- 'profiles': 'id auth_subject email role disabled',
+ 'profiles': 'id auth_subject email display_name username role disabled',
  'tracks': 'slug title weeks project_count content active',
  'applications': 'id user_id track_slug student_name college motivation start_date end_date status verification_id authorized_signatory completed_at created_at',
  'submissions': 'id application_id user_id project_index github_url live_url linkedin_url notes attachment status feedback reviewed_by updated_at',

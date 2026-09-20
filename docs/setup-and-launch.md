@@ -29,7 +29,7 @@ Set these routes in the app/Clerk configuration:
 - Sign-up: `/signup`
 - Successful sign-in/sign-up: `/dashboard`
 
-Copy the publishable key to `frontend/.env.local`. Find the Clerk instance/issuer URL in its JWT/session configuration and use the same instance on the backend. This is the `iss` value in its tokens (typically `https://your-instance.clerk.accounts.dev` during development). Do not use `https://api.clerk.com` as the issuer. The backend fetches its public JWKS; it does not need a Clerk secret key.
+Copy the publishable key to `frontend/.env.local`. Find the Clerk instance/issuer URL in its JWT/session configuration and use the same instance on the backend. This is the `iss` value in its tokens (typically `https://your-instance.clerk.accounts.dev` during development). Do not use `https://api.clerk.com` as the issuer. Token verification uses public JWKS. Set CLERK_SECRET_KEY only in backend/.env to sync verified account emails, names, and usernames into the administrator directory. The key must belong to the same Clerk instance as the frontend publishable key.
 
 For production configure your real frontend domain in Clerk and production Google credentials as instructed by Clerk. Use its production publishable key and issuer together. Authentication roles are stored in PostgreSQL, not in Clerk public metadata.
 
@@ -182,3 +182,9 @@ npm.cmd run build
 ```
 
 These checks do not contact your cloud accounts. After configuration, test real email-code login, Google login if enabled, per-student dashboard isolation, private uploads, and free certificate issuance. The support chat remains an automated guide, with no human agent connected.
+
+## Live account directory
+
+Use `/admin` for real accounts; `/admin/preview` contains sample data. The live directory includes accounts without applications, marked Not enrolled. The dashboard refreshes every 15 seconds while visible; Clerk synchronization is limited to once per minute per backend process. A sync outage is shown above the table while saved accounts remain available.
+
+Account display fields come from the [Clerk Backend API](https://clerk.com/docs/reference/backend-api). Only verified primary emails are stored. Sync never assigns administrator roles, changes access flags, or links accounts by email. Use the existing make-admin command with the verified Clerk user ID to assign roles. Apply database migrations before starting an updated backend.

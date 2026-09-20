@@ -4,7 +4,7 @@ import unittest
 from unittest.mock import AsyncMock, patch
 from fastapi.testclient import TestClient
 from backend.main import app
-from backend.security import valid_signature, captured_payment, level_unlocked, secure_url
+from backend.security import valid_signature, captured_payment, level_unlocked, secure_url, project_url
 
 class SecurityTests(unittest.TestCase):
     def test_signature_rejects_tampering_and_malformed_values(self):
@@ -25,6 +25,11 @@ class SecurityTests(unittest.TestCase):
         self.assertFalse(level_unlocked(6,8,[0,1,2,3,4]))
         self.assertTrue(level_unlocked(6,8,list(range(6))))
         self.assertFalse(level_unlocked(8,8,list(range(8))))
+    def test_project_urls_reject_non_web_and_malformed_links(self):
+        self.assertEqual(project_url(' https://up-feed.vercel.app/ '),'https://up-feed.vercel.app/')
+        for url in ['javascript:alert(1)', 'data:text/html,test', 'ftp://example.com/file', '//example.com', 'https://', 'https://example.com:bad', 'https://user:password@example.com', 'https://exa mple.com', 'https://example.com\\evil']:
+            with self.assertRaises(ValueError,msg=url): project_url(url)
+
     def test_urls_reject_wrong_hosts_and_unsafe_schemes(self):
         self.assertEqual(secure_url('https://github.com/a/b',{'github.com'}),'https://github.com/a/b')
         for url in ['javascript:alert(1)','https://github.com.evil.test/a/b','https://github.com@evil.test/a/b','http://github.com/a/b']:
@@ -69,13 +74,16 @@ class ApiTests(unittest.TestCase):
         database.assert_not_called()
     @patch('backend.main.database',new_callable=AsyncMock)
     @patch('backend.main.identity',new_callable=AsyncMock)
-    def test_repository_requires_owner_and_repository(self,identity,database):
+    def test_submission_accepts_any_http_project_link(self,identity,database):
         uid='11111111-1111-4111-8111-111111111111'
         identity.return_value=({'id':uid},False)
-        for url in ['https://github.com/owner/', 'https://github.com//repo', 'https://github.com/owner/repo/issues']:
-            response=self.client.post('/api/platform',json={'action':'submit','application_id':uid,'project_index':0,'github_url':url,'notes':'A detailed explanation of the completed project.'})
-            self.assertEqual(response.status_code,422)
-        database.assert_not_called()
+        for url in ['https://up-feed.vercel.app/', 'http://example.com/my-project', 'https://github.com/owner/', 'https://example.com/project?id=1']:
+            database.side_effect=[{'id':uid,'user_id':uid,'status':'approved','track_slug':'python'}, {'project_count':6}, [], [{}]]
+            response=self.client.post('/api/platform',json={'action':'submit','application_id':uid,'project_index':0,'github_url':url,'live_url':'http://example.com/demo','linkedin_url':'https://example.com/post','notes':'A detailed explanation of the completed project.'})
+            self.assertEqual(response.status_code,200,response.text)
+            self.assertEqual(database.call_args.kwargs['body']['github_url'],url)
+            self.assertEqual(database.call_args.kwargs['body']['status'],'pending')
+
     @patch('backend.main.database',new_callable=AsyncMock)
     @patch('backend.main.identity',new_callable=AsyncMock)
     def test_application_rejects_whitespace_only_fields(self,identity,database):

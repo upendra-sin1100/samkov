@@ -100,3 +100,6 @@ html[data-theme=dark] .progressbar{background:#303747}
 @keyframes tag-drift{0%,100%{transform:translateY(0) rotate(2deg)}50%{transform:translateY(-9px) rotate(-2deg)}}
 @media(max-width:800px){.intro-visual .intro-orbit{inset:8px}.hero-cube{right:30px;top:-9px}.hero-float-tag{left:12px;font-size:9px}}
 @media(prefers-reduced-motion:reduce){.intro-visual .build-board{transform:none}.hero-cube{transform:rotateX(-20deg) rotateY(30deg)}.intro-sticker{transform:none}}
+
+/* Keep two-digit level and task numbers together at every screen width. */
+.number,.task-index{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;white-space:nowrap;word-break:normal;overflow-wrap:normal;font-variant-numeric:tabular-nums;min-width:2ch}

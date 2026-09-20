@@ -20,3 +20,19 @@ def secure_url(value: str, hosts: set[str] | None = None) -> str:
     if url.scheme != 'https' or not url.hostname or url.username or url.password or (hosts and url.hostname not in hosts):
         raise ValueError('Use a valid HTTPS URL from the requested service.')
     return value
+
+def project_url(value: str) -> str:
+    """Accept user-provided web links without fetching or judging their content."""
+    value = value.strip()
+    try:
+        url = urlparse(value)
+        if (url.scheme not in {'http', 'https'} or not url.hostname
+                or url.username is not None or url.password is not None
+                or any(character.isspace() or ord(character) < 32 for character in value)
+                or '\\' in value):
+            raise ValueError()
+        # Accessing port also rejects invalid/out-of-range port numbers.
+        url.port
+    except ValueError as exc:
+        raise ValueError('Enter a valid project link starting with http:// or https://.') from exc
+    return value
