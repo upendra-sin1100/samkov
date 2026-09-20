@@ -1,6 +1,6 @@
 # SamkovAI
 
-Project-based virtual internships with a Next.js frontend and Python/FastAPI backend.
+Project-based virtual internships with a React / JavaScript (Next.js) frontend and Python/FastAPI backend.
 
 **Current stack: Neon PostgreSQL + Clerk authentication + private file storage.** Supabase is no longer a runtime dependency. The original `supabase/schema.sql` remains only as a migration reference.
 
@@ -46,7 +46,7 @@ Without a Clerk public key, the UI offers an explicitly labeled in-memory previe
 ## Checks
 
 ```powershell
-npm.cmd run typecheck
+npm.cmd run check
 npm.cmd test
 npm.cmd run test:frontend
 npm.cmd run test:database
@@ -57,7 +57,7 @@ Backend tests cover authorization, JWT verification, payment verification, query
 
 ## Included flows
 
-The admin dashboard lives at `/admin` and requires a server-verified administrator account when authentication is configured. It includes a searchable learner sheet, level and course filters, pending reviews, CSV export, and a user details panel. **Approve & Promote** approves the pending evidence for the current level only when every required project has been submitted; the existing project gates then unlock the next level. Final program completion remains in `/admin/manage`, alongside curriculum, resources, and certificate controls.
+The admin dashboard lives at `/admin` and requires a server-verified administrator account when authentication is configured. It includes a searchable learner sheet, level and course filters, pending reviews, CSV export, and a user details panel. **Approve & Promote** approves the pending evidence for the current level only when every required project has been submitted; the existing project gates then unlock the next level. The user details panel includes written review feedback, requests for changes, and final program completion. Curriculum, resources, account access, and certificate controls remain in `/admin/manage`.
 
 Use `/admin/preview` to explore the dashboard with clearly labeled sample learners. Preview changes are in memory only and never update live accounts. Project links are available for actual submissions; sample submissions do not link to invented repositories.
 
@@ -68,3 +68,9 @@ Eight initial tracks, curated course links, three project levels, application re
 Host `frontend/` as the Next.js app and `backend/` as a Python service. Set `PYTHON_API_URL` before building the frontend. Keep database credentials, file credentials, and payment secrets on the backend. Neon stores structured records; upload binaries use a private bucket or persistent backend disk, not database space. The backend pool opens at most four connections per worker.
 
 No cloud accounts or live payment credentials are provisioned by this repository. Verify real Clerk login, Neon connectivity, uploads, and free certificate issuance before enabling a live program.
+
+## JavaScript source and review integrity
+
+Frontend components use `.jsx` and shared modules use `.js`. `npm run check` checks JavaScript/JSX syntax; the production build verifies module imports and routes. TypeScript remains a development tool for these checks, not the application source language.
+
+Apply `python -m backend.manage migrate` to existing databases before deploying these changes. The repeatable migrations preserve approved evidence, prevent changes to submission ownership, and retain existing learner data. Reviews accept pending submissions only and reject stale concurrent decisions.

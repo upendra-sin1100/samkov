@@ -22,8 +22,9 @@ def main():
             conn.execute(Path(__file__).with_name('schema.sql').read_text(encoding='utf-8'))
             print('Database initialized. Eight tracks are ready.')
         elif args.command=='migrate':
-            conn.execute(Path(__file__).with_name('migrations').joinpath('001_free_access_analytics.sql').read_text(encoding='utf-8'))
-            print('Free certificates and analytics migration applied.')
+            for migration in sorted(Path(__file__).with_name('migrations').glob('*.sql')):
+                conn.execute(migration.read_text(encoding='utf-8'))
+            print('All database migrations applied.')
         elif args.command=='make-admin':
             if not args.clerk_user_id or not args.clerk_user_id.startswith('user_'): parser.error('Supply --clerk-user-id for the trusted administrator.')
             result=conn.execute("UPDATE public.profiles SET role='admin' WHERE auth_subject=%s RETURNING id",(args.clerk_user_id,)).fetchone()

@@ -7,3 +7,7 @@
 @media(prefers-reduced-motion:reduce){.ad-shell *{transition:none!important}}
 
 .ad-live-note{font-size:12px;color:var(--muted);margin:-8px 0 24px}
+.ad-review-controls { display: grid; gap: 8px; margin-top: 14px; }
+.ad-review-controls label { font-size: 12px; font-weight: 600; }
+.ad-review-controls textarea { width: 100%; min-height: 90px; padding: 10px; border: 1px solid var(--line, #dce1ec); border-radius: 8px; color: inherit; background: transparent; font: inherit; resize: vertical; }
+.ad-review-controls > div { display: flex; flex-wrap: wrap; gap: 8px; }

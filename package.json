@@ -12,7 +12,8 @@
     "typecheck": "npm run typecheck --workspace frontend",
     "test": "node scripts/test-backend.cjs",
     "test:frontend": "node scripts/test-frontend.cjs",
-    "test:database": "node scripts/test-database.cjs"
+    "test:database": "node scripts/test-database.cjs",
+    "check": "npm run check --workspace frontend"
   },
   "overrides": {
     "postcss": "^8.5.23"

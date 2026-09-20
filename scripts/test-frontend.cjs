@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const ts = require('typescript');
 const moduleResult = {exports:{}};
-const source = fs.readFileSync('frontend/app/workspace-state.ts','utf8');
+const source = fs.readFileSync('frontend/app/workspace-state.js','utf8');
 const compiled = ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
 new Function('module','exports',compiled)(moduleResult,moduleResult.exports);
 const {selectApplication,certificatesForApplication,certificateIdFromPath} = moduleResult.exports;

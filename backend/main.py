@@ -53,6 +53,7 @@ class SubmissionInput(BaseModel):
     notes:str=Field(min_length=30,max_length=5000)
     attachment:str|None=Field(default=None,max_length=500)
 class ReviewInput(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
     id:UUID
     status:str=Field(pattern=r'^(approved|rejected)$')
     feedback:str=Field(min_length=10,max_length=3000)
@@ -150,9 +151,11 @@ async def platform(request:Request):
         require_admin()
         p=ReviewInput.model_validate(b)
         s=await database('submissions',params={'id':'eq.'+str(p.id)},one=True)
+        if s['status']!='pending': raise HTTPException(409,'This submission has already been reviewed. Refresh to see its current status.')
         a=await database('applications',params={'id':'eq.'+s['application_id']},one=True)
         if a['status']!='approved': raise HTTPException(409,'This internship is no longer open for review.')
-        await database('submissions','PATCH',params={'id':'eq.'+str(p.id)},body={'status':p.status,'feedback':p.feedback,'reviewed_by':user['id'],'updated_at':datetime.now(timezone.utc).isoformat()})
+        changed=await database('submissions','PATCH',params={'id':'eq.'+str(p.id),'status':'eq.pending'},body={'status':p.status,'feedback':p.feedback,'reviewed_by':user['id'],'updated_at':datetime.now(timezone.utc).isoformat()})
+        if not changed: raise HTTPException(409,'Another administrator already reviewed this submission. Refresh to see its current status.')
     elif action=='complete':
         require_admin()
         await database('rpc/complete_application','POST',body={'app_id':valid_uuid(b['id'])})

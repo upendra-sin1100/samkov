@@ -32,6 +32,27 @@ class SecurityTests(unittest.TestCase):
 
 class ApiTests(unittest.TestCase):
     def setUp(self): self.client=TestClient(app)
+    @patch('backend.main.database',new_callable=AsyncMock)
+    @patch('backend.main.identity',new_callable=AsyncMock)
+    def test_reviews_reject_already_reviewed_and_concurrent_updates(self,identity,database):
+        uid='11111111-1111-4111-8111-111111111111'
+        identity.return_value=({'id':uid},True)
+        body={'action':'review','id':uid,'status':'rejected','feedback':'Please add reproducible test evidence.'}
+        database.return_value={'id':uid,'application_id':uid,'status':'approved'}
+        self.assertEqual(self.client.post('/api/platform',json=body).status_code,409)
+        self.assertEqual(database.call_count,1)
+        database.reset_mock()
+        database.side_effect=[{'id':uid,'application_id':uid,'status':'pending'},{'status':'approved'},[]]
+        self.assertEqual(self.client.post('/api/platform',json=body).status_code,409)
+        self.assertEqual(database.call_args.kwargs['params']['status'],'eq.pending')
+    @patch('backend.main.database',new_callable=AsyncMock)
+    @patch('backend.main.identity',new_callable=AsyncMock)
+    def test_review_requires_meaningful_feedback(self,identity,database):
+        uid='11111111-1111-4111-8111-111111111111'
+        identity.return_value=({'id':uid},True)
+        response=self.client.post('/api/platform',json={'action':'review','id':uid,'status':'rejected','feedback':' '*30})
+        self.assertEqual(response.status_code,422)
+        database.assert_not_called()
     @patch('backend.main.identity',new_callable=AsyncMock)
     def test_malformed_operations_return_validation_errors(self,identity):
         identity.return_value=({'id':'11111111-1111-4111-8111-111111111111'},True)

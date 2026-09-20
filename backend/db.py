@@ -6,6 +6,7 @@ Sync psycopg runs in worker threads to also support Windows' default event loop.
 """
 import asyncio
 import os
+from contextlib import contextmanager
 from functools import lru_cache
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
@@ -34,6 +35,17 @@ def pool():
     return ConnectionPool(url, min_size=0, max_size=4, timeout=15,
                           kwargs={'row_factory':dict_row, 'connect_timeout':10,
                                   'prepare_threshold':None}, open=True)
+
+@contextmanager
+def connection():
+    """Give every database operation the same safe, retryable error contract."""
+    try:
+        with pool().connection() as conn:
+            yield conn
+    except (OperationalError, PoolTimeout) as exc:
+        raise HTTPException(503, 'Database temporarily unavailable. Please retry.') from exc
+    except DatabaseError as exc:
+        raise HTTPException(409, 'Operation could not be completed. Check eligibility, duplicates, and required fields.') from exc
 
 def column(table, name):
     if name not in TABLES[table].split():
@@ -89,13 +101,8 @@ def build_query(table, method, params, body):
 
 def query_sync(table, method='GET', params=None, body=None, one=False):
     query, values = build_query(table,method,params,body)
-    try:
-        with pool().connection() as conn:
-            rows = conn.execute(query,values).fetchall()
-    except (OperationalError, PoolTimeout) as exc:
-        raise HTTPException(503,'Database temporarily unavailable. Please retry.') from exc
-    except DatabaseError as exc:
-        raise HTTPException(409,'Operation could not be completed. Check eligibility, duplicates, and required fields.') from exc
+    with connection() as conn:
+        rows = conn.execute(query,values).fetchall()
     if one and not rows: raise HTTPException(404,'Record not found.')
     return jsonable_encoder(rows[0] if one else rows)
 
@@ -103,23 +110,23 @@ async def database(table, method='GET', params=None, body=None, one=False):
     return await asyncio.to_thread(query_sync,table,method,params,body,one)
 
 def profile_for_subject(subject):
-    with pool().connection() as conn:
+    with connection() as conn:
         # Imported accounts must be linked explicitly; never link by an unverified email claim.
         return conn.execute('INSERT INTO public.profiles(auth_subject) VALUES (%s) ON CONFLICT(auth_subject) DO UPDATE SET auth_subject=EXCLUDED.auth_subject RETURNING id,role,disabled', (subject,)).fetchone()
 
 
 def record_visit(event_id):
-    with pool().connection() as conn:
+    with connection() as conn:
         inserted = conn.execute("INSERT INTO public.view_receipts(id) VALUES (%s) ON CONFLICT DO NOTHING RETURNING id", (event_id,)).fetchone()
         if inserted:
             conn.execute("INSERT INTO public.site_views(day,views) VALUES(current_date,1) ON CONFLICT(day) DO UPDATE SET views=site_views.views+1")
         conn.execute("DELETE FROM public.view_receipts WHERE seen_at < now() - interval '1 day'")
 
 def touch_user(user_id):
-    with pool().connection() as conn:
+    with connection() as conn:
         conn.execute("UPDATE public.profiles SET last_seen_at=now() WHERE id=%s", (user_id,))
 
 def analytics_snapshot():
-    with pool().connection() as conn:
+    with connection() as conn:
         row = conn.execute("SELECT (SELECT coalesce(sum(views),0) FROM public.site_views) AS total_views, (SELECT coalesce(sum(views),0) FROM public.site_views WHERE day=current_date) AS views_today, count(*) FILTER (WHERE NOT disabled) AS total_users, count(*) FILTER (WHERE NOT disabled AND last_seen_at > now()-interval '5 minutes') AS active_users, now() AS updated_at FROM public.profiles").fetchone()
         return jsonable_encoder(row)

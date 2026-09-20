@@ -20,6 +20,9 @@ const assert=require('node:assert/strict');
    await db.query("UPDATE submissions SET status='approved' WHERE application_id=$1 AND project_index=$2",[app,i]);
   }
   await assert.rejects(db.query("UPDATE submissions SET notes='tampered' WHERE application_id=$1 AND project_index=0",[app]),/immutable/);
+  for (const mutation of ["live_url='https://example.com'", "linkedin_url='https://linkedin.com/in/other'", "status='rejected'", "project_index=20", "user_id='"+other+"'"]) {
+   await assert.rejects(db.query(`UPDATE submissions SET ${mutation} WHERE application_id=$1 AND project_index=0`,[app]),/immutable|Application not open|Invalid project/);
+  }
   await assert.rejects(db.query('SELECT * FROM issue_certificate($1)',[app]),/Completion not approved/);
   await db.query('SELECT complete_application($1)',[app]);
   const cert=(await db.query('SELECT * FROM issue_certificate($1)',[app])).rows[0];
@@ -30,6 +33,8 @@ const assert=require('node:assert/strict');
   assert.equal((await db.query('SELECT * FROM issue_certificate($1)',[app])).rows[0].status,'revoked');
   await db.exec(fs.readFileSync('backend/migrations/001_free_access_analytics.sql','utf8'));
   await db.exec(fs.readFileSync('backend/migrations/001_free_access_analytics.sql','utf8'));
+  await db.exec(fs.readFileSync('backend/migrations/002_review_integrity.sql','utf8'));
+  await db.exec(fs.readFileSync('backend/migrations/002_review_integrity.sql','utf8'));
   assert.equal((await db.query('SELECT count(*)::int AS n FROM certificates')).rows[0].n,1);
   await assert.rejects(submit(0),/Application not open/);
   assert.ok((await db.query('SELECT count(*)::int AS n FROM audit_log')).rows[0].n>0);

@@ -13,7 +13,7 @@ Observed 2026-09-17. Links are external learning materials; we do not host or co
 | Cybersecurity | https://www.nexlevr.app/resources/cybersecurity |
 | Web Development | https://www.nexlevr.app/resources/full-stack-developer |
 
-The specific URLs, language, and video/playlist classification are maintained in frontend/app/video-resources.ts. SamkovAI task descriptions are independently authored. Source pages were inspected through their public rendered links.
+The specific URLs, language, and video/playlist classification are maintained in frontend/app/video-resources.js. SamkovAI task descriptions are independently authored. Source pages were inspected through their public rendered links.
 
 ## Official course links checked on 2026-09-18
 
@@ -30,4 +30,4 @@ These course landing pages were fetched from their publishers and are linked fro
 | Web Development | https://developer.mozilla.org/en-US/curriculum/ |
 | Cybersecurity | https://portswigger.net/web-security |
 
-Built-in links are maintained in `frontend/app/data.ts`. The public catalogue also returns administrator-added links for active tracks, selecting only track, title, and URL. No database migration is required.
+Built-in links are maintained in `frontend/app/data.js`. The public catalogue also returns administrator-added links for active tracks, selecting only track, title, and URL. No database migration is required.

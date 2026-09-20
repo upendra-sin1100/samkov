@@ -12,6 +12,15 @@ from backend.auth import verify_token, identity
 from backend import files
 
 class QueryTests(unittest.TestCase):
+    @patch('backend.db.pool')
+    def test_profile_database_outage_returns_safe_retryable_error(self,pool):
+        from psycopg import OperationalError
+        from backend.db import profile_for_subject
+        pool.return_value.connection.side_effect=OperationalError('private connection details')
+        with self.assertRaises(HTTPException) as error:
+            profile_for_subject('user_test')
+        self.assertEqual(error.exception.status_code,503)
+        self.assertNotIn('private',error.exception.detail)
     def test_user_values_never_become_sql(self):
         attack="x' OR true --"
         query,values=build_query('applications','GET',{'user_id':'eq.'+attack},None)
