@@ -8,11 +8,12 @@ import TaskWorkspace, { TaskCatalogue } from './task-workspace';
 import AdminManagement from './admin-management';
 import AdminDashboard from './admin-dashboard';
 import Home from './home';
+import InternshipCard from './internship-card';
+import Brand from './brand';
 import ActivityTracker from './activity-tracker';
 import ThemeToggle from './theme-toggle';
 import SupportChat from './support-chat';
 import OtpLogin from './otp-login';
-const icons = { chart: ChartNoAxesCombined, brain: BrainCircuit, code: Code2, terminal: Terminal, shield: ShieldCheck, spark: Sparkles, pie: ChartPie };
 export default function Platform() {
     const account = useAccount(), configured = account.configured;
     const [selectedApplicationId, setSelectedApplicationId] = useState('');
@@ -85,8 +86,8 @@ export default function Platform() {
     } }
     const slug = path.split('/')[2] || 'machine-learning', track = tracks.find(t => t.slug === slug) || tracks[1], application = selectApplication(records.applications, path, selectedApplicationId), activeTrack = tracks.find(t => t.slug === application?.track_slug) || track, names = projectNames[activeTrack.slug], approved = records.submissions.filter((s) => s.status === 'approved' && s.application_id === application?.id), progress = application ? Math.round(approved.length / names.length * 100) : 0;
     const applicationCertificates = certificatesForApplication(records.certificates, application?.id);
-    function Logo() { return <a href="/" className="brand" onClick={e => { e.preventDefault(); go('/'); }}><span className="brandmark"><ArrowUpRight size={23} strokeWidth={3}/></span>SamkovAI</a>; }
-    function Card({ t }) { const Icon = icons[t.icon]; return <article className="track-card"><div className="card-top"><span className={'track-icon ' + t.color}><Icon size={26}/></span><span className="free-badge">Free internship</span></div><div className="eyebrow muted">{t.category}</div><h3>{t.name}</h3><p>{t.description}</p><div className="skill-tags">{t.skills.map(s => <span key={s}>{s}</span>)}</div><div className="card-meta"><span><Clock size={14}/>{t.weeks} weeks</span><span><Layers size={14}/>{t.projects} projects</span></div><button className="card-link" onClick={() => go('/internships/' + t.slug)}>Explore internship <ArrowUpRight size={18}/></button></article>; }
+    function Logo() { return <Brand onClick={e => { e.preventDefault(); go('/'); }}/>; }
+    function Card({ t }) { return <InternshipCard track={t} go={go}/>; }
     function PageTitle({ eyebrow, title, description }) { return <div className="page-title"><div className="eyebrow blue-text">{eyebrow}</div><h1>{title}</h1><p>{description}</p></div>; }
     function guard() { return <div className="empty panel"><Lock size={36}/><h2>Your next chapter starts here.</h2><p>Sign in to apply, track your projects, and access your documents.</p><button className="primary" onClick={() => go('/login')}>Sign in / Create account <ArrowRight size={17}/></button></div>; }
     const isWorkspace = ['/dashboard', '/learn', '/submit', '/offer', '/certificate', '/admin'].some(p => path.startsWith(p));

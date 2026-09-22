@@ -37,7 +37,8 @@ backend/uploads/
 .codex/
 .agents/
 .idea/
-.vscode/
+.vscode/*
+!.vscode/tasks.json
 .DS_Store
 Thumbs.db
 Desktop.ini

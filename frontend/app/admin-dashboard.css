@@ -20,3 +20,5 @@
 .ad-panel-size{display:flex;align-items:center;gap:12px;padding:12px 24px;border-bottom:1px solid var(--ad-line);font-size:11px;color:#b8c3ac}
 .ad-panel-size span{margin-right:auto}.ad-panel-size button{text-decoration:underline;white-space:nowrap}
 @media(max-width:600px){.ad-panel-size span{display:none}.ad-resize-handle{display:none}.ad-resizable-drawer{padding-left:0;width:100vw!important}}
+
+.ad-evidence > .ad-review-controls { display: grid; grid-template-columns: minmax(0, 1fr); align-items: stretch; }

@@ -171,6 +171,16 @@ npm.cmd run start -- --port 3000
 
 Do not start two frontend servers on the same port. Use `npm.cmd` if PowerShell blocks `npm.ps1`. The site no longer loads Google Fonts as an external render-blocking dependency.
 
+### VS Code on Windows
+
+Open `D:\samkovAI` as your VS Code folder. In a regular PowerShell terminal, run `npm.cmd run dev -- --port 3000`. Using `npm.cmd` avoids the PowerShell script execution-policy restriction; it does not require changing that policy or running VS Code as administrator. You can also choose **Terminal → Run Task → SamkovAI: Start frontend** to launch the same command directly.
+
+If PowerShell cannot find `npm.cmd`, restart VS Code after installing Node so it picks up the updated PATH. For this machine's Node installation, `& 'D:\nodejs\npm.cmd' run dev -- --port 3000` also works from the project folder.
+
+`EADDRINUSE` means another server is already listening on port 3000. Stop that server in its terminal with Ctrl+C before starting another one. Administrator mode does not resolve a port conflict. Avoid switching ports casually because the authentication origins are configured for localhost:3000.
+
+Development uses `frontend/.next-dev`; production builds use `frontend/.next`. The separate caches prevent a production build from corrupting a running development preview. The file watcher ignores Windows paging, hibernation, dump, and system directories before trying to inspect them. Restart the development server after changing its configuration.
+
 ## 9. Verification
 
 ```powershell
