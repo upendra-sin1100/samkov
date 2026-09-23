@@ -1,0 +1,62 @@
+/* Learning paths: an original decorative layer, separate from the content. */
+.intro-home{--orbit-line:#bd5a2b;--orbit-node:#c7541d;--orbit-cool:#328d92;--atmosphere-dot:#9e7960;position:relative;isolation:isolate}
+.intro-hero-stage{position:relative;isolation:isolate;background:var(--surface);overflow:clip}
+.intro-hero-stage .intro-hero{position:relative;z-index:1}
+.learning-atmosphere{position:absolute;inset:0;pointer-events:none;overflow:hidden;--drift-x:0px;--drift-y:0px}
+.atmosphere-grid{position:absolute;inset:0;background-image:radial-gradient(var(--atmosphere-dot) .75px,transparent .75px);background-size:27px 27px;opacity:.2;mask-image:linear-gradient(90deg,transparent 20%,#000 76%),linear-gradient(0deg,#000,transparent 25%);mask-composite:intersect}
+.atmosphere-glow{position:absolute;width:850px;height:850px;right:-180px;top:-150px;border-radius:50%;background:radial-gradient(ellipse at 58% 45%,#ffc9a44a,transparent 62%);transform:translate(var(--drift-x),var(--drift-y));transition:transform .8s ease-out}
+.atmosphere-orbits{position:absolute;right:-230px;top:-90px;width:min(1000px,77vw);transform:translate(var(--drift-x),var(--drift-y));transition:transform 1.2s ease-out}
+.atmosphere-orbits svg{width:100%;height:auto;overflow:visible}
+.orbit-contours{stroke:var(--orbit-line);stroke-width:.8;opacity:.19;transform-origin:520px 440px;animation:learning-orbit 48s ease-in-out infinite alternate}
+.orbit-route{stroke:var(--orbit-line);stroke-width:1.6;opacity:.45;stroke-dasharray:5 9}
+.orbit-stations{fill:var(--surface);stroke:var(--orbit-node);stroke-width:2;opacity:.7}
+.orbit-satellite{fill:var(--orbit-node);opacity:.65;transform-origin:520px 440px;animation:learning-orbit 48s ease-in-out infinite alternate}
+.orbit-satellite-cool{fill:var(--orbit-cool);animation-direction:alternate-reverse}
+.orbit-cross{stroke:var(--orbit-cool);stroke-width:1.5;opacity:.5}
+.atmosphere-ribbon{position:absolute;width:460px;height:460px;border:58px solid #e9bfa333;border-radius:50%;left:-315px;bottom:-290px;transform:rotateX(35deg) rotate(-25deg)}
+.atmosphere-coordinate{position:absolute;font:9px/1.4 monospace;letter-spacing:2px;color:var(--muted);opacity:.65}
+.atmosphere-coordinate-one{right:26px;top:90px;writing-mode:vertical-rl}
+.atmosphere-coordinate-two{right:150px;bottom:27px}
+.atmosphere-motion{position:absolute;z-index:2;bottom:22px;left:max(24px,calc((100% - 1240px)/2));display:inline-flex;align-items:center;gap:7px;padding:7px 10px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:30px;font-size:10px;min-height:32px}
+.atmosphere-motion:hover{color:var(--ink);border-color:var(--muted)}
+/* Keep the original hero motion alongside the decorative background. */
+.intro-hero-stage .intro-orbit{display:none}
+.intro-hero-stage .build-board{box-shadow:0 24px 64px #59301512}
+
+
+
+.intro-about,.intro-paths,.intro-last{position:relative;isolation:isolate}
+.intro-about:before{content:"";position:absolute;z-index:-1;width:210px;height:210px;border:1px solid var(--orbit-line);border-radius:50%;left:-210px;top:60px;opacity:.17;box-shadow:0 0 0 22px var(--surface),0 0 0 23px var(--orbit-line)}
+.intro-process{position:relative;isolation:isolate;overflow:clip}
+.intro-process:before{content:"";position:absolute;z-index:-1;width:760px;height:760px;right:-450px;top:40px;border-radius:50%;border:1px solid var(--orbit-line);box-shadow:0 0 0 30px var(--surface-alt),0 0 0 31px var(--orbit-line),0 0 0 62px var(--surface-alt),0 0 0 63px var(--orbit-line);opacity:.14;transform:rotateX(30deg)}
+.intro-paths:before{content:"";position:absolute;z-index:-1;inset:20px -45px auto;height:260px;background-image:radial-gradient(var(--atmosphere-dot) .8px,transparent .8px);background-size:24px 24px;mask-image:linear-gradient(0deg,transparent,#000);opacity:.13}
+.intro-last{overflow:hidden;background:radial-gradient(ellipse at 50% 110%,#efa36b21,transparent 65%)}
+.intro-last:before,.intro-last:after{content:"";position:absolute;z-index:-1;bottom:-280px;width:400px;height:400px;border:1px solid var(--orbit-line);border-radius:50%;opacity:.2}
+.intro-last:before{left:-140px}.intro-last:after{right:-140px}
+html[data-theme=dark] .intro-home{--orbit-line:#db8a5a;--orbit-node:#f3aa74;--orbit-cool:#71b8be;--atmosphere-dot:#c3afa0}
+html[data-theme=dark] .atmosphere-glow{background:radial-gradient(ellipse at 58% 45%,#c36c322b,transparent 62%)}
+html[data-theme=dark] .orbit-contours{opacity:.24}
+html[data-theme=dark] .atmosphere-ribbon{border-color:#b7764024}
+html[data-theme=dark] .intro-hero-stage .build-board{box-shadow:0 24px 64px #0005}
+@keyframes learning-orbit{from{transform:rotate(-8deg)}to{transform:rotate(12deg)}}
+.learning-atmosphere[data-paused=true] *{animation-play-state:paused!important;transition:none}
+@media(max-width:800px){.atmosphere-orbits{width:850px;top:350px;right:-300px}.atmosphere-glow{top:320px;right:-320px}.atmosphere-coordinate-one{top:480px;right:12px}.atmosphere-coordinate-two{right:30px;bottom:25px}.atmosphere-motion{bottom:15px;left:22px}.intro-hero-stage .intro-hero{padding-bottom:85px}.atmosphere-grid{mask-image:linear-gradient(0deg,#000,transparent 75%)}.intro-paths:before{inset-inline:0}}
+@media(max-width:480px){.atmosphere-orbits{width:700px;right:-285px;top:430px}.atmosphere-coordinate-one{display:none}.atmosphere-coordinate-two{font-size:8px;letter-spacing:1px}.atmosphere-ribbon{display:none}}
+@media(prefers-reduced-motion:reduce){.learning-atmosphere *{animation:none!important;transition:none!important}.atmosphere-motion{display:none}.atmosphere-glow,.atmosphere-orbits{transform:none}}
+@media print{.learning-atmosphere,.atmosphere-motion{display:none}}
+
+.intro-hero-stage:has(.learning-atmosphere[data-paused=true]) :is(.build-board,.hero-cube,.intro-sticker,.hero-float-tag){animation-play-state:paused}
+@media(prefers-reduced-motion:reduce){.intro-hero-stage :is(.build-board,.hero-cube,.intro-sticker,.hero-float-tag){animation:none!important}}
+
+/* The strings bend locally under the pointer; their parent stays still. */
+.learning-atmosphere .orbit-contours{animation:none;opacity:.28;transition:opacity .35s,stroke .35s}
+.learning-atmosphere[data-interacting=true] .orbit-contours{opacity:.48;stroke:var(--orbit-node)}
+.orbit-string{vector-effect:non-scaling-stroke;stroke-linejoin:round}
+
+/* Light-mode detail: clear labels and warm texture around the motion control. */
+html:not([data-theme=dark]) .atmosphere-coordinate{color:#62605d;opacity:1;font-size:10px}
+html:not([data-theme=dark]) .atmosphere-motion{color:#4d4038;background:#fffaf6;border-color:#cba78e;font-size:11px;font-weight:600}
+html:not([data-theme=dark]) .atmosphere-grid{opacity:.36;--atmosphere-dot:#b96530}
+html:not([data-theme=dark]) .atmosphere-ribbon{border-color:#d9874938}
+html:not([data-theme=dark]) .learning-atmosphere .orbit-contours{opacity:.36;stroke-width:1}
+html:not([data-theme=dark]) .learning-atmosphere[data-interacting=true] .orbit-contours{opacity:.58}
