@@ -109,8 +109,8 @@ html[data-theme=dark] .progressbar{background:#303747}
 /* Contain the decorative background without clipping the floating cube or badge. */
 .intro-home{overflow-x:clip}
 :root{--blue:#b9430b;--accent-soft:#fff0e6;--intro-border:#e9e2db}
-html[data-theme=light]{color-scheme:light;--surface:#fff;--surface-alt:#faf8f5;--ink:#171717;--navy:#171717;--line:#e8e2dc}
-html[data-theme=light] .intro-hero h1>span{background-image:linear-gradient(110deg,#a83b09,#e56a25,#a83b09)}
+html[data-theme=light]{color-scheme:light;--surface:#fff;--surface-alt:#faf8f5;--ink:#171717;--navy:#171717;--muted:#525d70;--green:#237455;--line:#e8e2dc}
+html[data-theme=light] .intro-hero h1>span{background-image:linear-gradient(110deg,#a83b09,#bd4b10,#a83b09)}
 html[data-theme=light] .primary{background:#b9430b;border-color:#b9430b}
 html[data-theme=light] .primary:hover{background:#973507}
 html[data-theme=light] .hero-cube i{border-color:#f49a60;background:linear-gradient(135deg,#ffb17ccc,#de5c204d)}
@@ -138,3 +138,10 @@ html[data-theme=dark] .internship-card{--card-tint:#282332;--card-accent:#bea2f0
 @media(max-width:600px){.internship-card-body{padding:20px 20px 0}.internship-art{height:116px}.internship-card h3{font-size:21px}.process-preview{min-height:390px}.process-preview-top>svg{padding:9px}.process-preview h3{font-size:23px}}
 @media(prefers-reduced-motion:reduce){.internship-card,.internship-art>svg,.internship-card .card-link>span,.process-dots button{transition:none}.internship-card:hover,.internship-card:focus-within,.internship-card:hover .internship-art>svg,.internship-card:focus-within .internship-art>svg{transform:none}}
 .internship-card-body{text-align:left}
+
+/* Secondary text on light surfaces stays readable at small sizes. */
+html:not([data-theme=dark]) :is(footer>span,.task-level-title small,.task-path-top>span:last-child,.task-path-bottom>span,.task-status,.skill-tags span,.card-meta,.filter-caption,.journey-progress,.journey-bottom,.visual-caption,.sample-badge,.or,.document-label,.document dt,.verification dt,.timeline span:not(.complete)){color:#525d70}
+html:not([data-theme=dark]) :is(input,textarea)::placeholder{color:#626b7a;opacity:1}
+html:not([data-theme=dark]) .free-badge{color:var(--green)}
+html:not([data-theme=dark]) .task-level.level-1{--level-color:#b43c32}
+html:not([data-theme=dark]) .task-level.level-2{--level-color:#806000}
