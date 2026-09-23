@@ -109,3 +109,17 @@ html[data-theme=dark] .sk-path-card .sk-sticker svg{color:#237455}
 @media(max-width:480px){.sk-path-card{padding:24px 18px 44px}.sk-path-card .sk-sticker{right:12px;padding:11px 14px}.sk-hero-visual .sk-cube{right:25px;top:-14px}}
 html:not([data-theme=dark]) .sk-card-eyebrow,html:not([data-theme=dark]) .sk-project-row small{color:#485366}
 .sk-project-row small{font-size:12px}
+
+/* Use wide screens for comfortable copy and a larger project preview. */
+.sk-hero{max-width:1480px;grid-template-columns:1.1fr 1fr;gap:clamp(44px,5vw,96px)}
+.sk-lede{font-size:20px;line-height:1.7;max-width:55ch;margin-top:28px;color:var(--muted)}
+.sk-kicker,.sk-promises{font-size:15px}
+.sk-card-eyebrow,.sk-project-row small{font-size:13px;letter-spacing:.8px}
+.sk-project-row strong{font-size:17px}.sk-project-row{padding:20px;gap:16px}
+.sk-route span{font-size:14px}.sk-route{margin-block:26px}
+.sk-snippet{font-size:14px;line-height:1.9;padding:18px}
+.sk-path-card .sk-sticker span{font-size:14px}.sk-path-card .sk-sticker small{font-size:13px}
+html:not([data-theme=dark]) :is(.sk-lede,.sk-kicker,.sk-promises,.sk-card-eyebrow,.sk-project-row small,.sk-snippet){color:#394150}
+@media(min-width:1200px){.sk-hero{padding-block:76px 90px}.sk-path-card{padding:36px 32px 56px}.sk-path-card h2{font-size:40px}.sk-hero h1{font-size:clamp(60px,4.1vw,76px)}.sk-hero-visual{max-width:none}.sk-actions{margin-bottom:28px}}
+@media(max-width:900px){.sk-hero{grid-template-columns:1fr;gap:70px}.sk-hero-visual{max-width:520px}.sk-lede{font-size:18px}}
+@media(max-width:480px){.sk-lede{font-size:17px;line-height:1.7}.sk-kicker,.sk-promises{font-size:14px}.sk-project-row{padding:14px 10px;gap:9px}.sk-project-row strong{font-size:14px}.sk-snippet{font-size:12px;padding:12px 10px;overflow-wrap:anywhere}.sk-route span{font-size:13px}.sk-path-card .sk-sticker span{font-size:13px}}

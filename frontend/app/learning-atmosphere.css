@@ -60,3 +60,4 @@ html:not([data-theme=dark]) .atmosphere-grid{opacity:.36;--atmosphere-dot:#b9653
 html:not([data-theme=dark]) .atmosphere-ribbon{border-color:#d9874938}
 html:not([data-theme=dark]) .learning-atmosphere .orbit-contours{opacity:.36;stroke-width:1}
 html:not([data-theme=dark]) .learning-atmosphere[data-interacting=true] .orbit-contours{opacity:.58}
+@media(min-width:1200px){.atmosphere-motion{left:max(64px,calc((100% - 1480px)/2))}}

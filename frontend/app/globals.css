@@ -145,3 +145,13 @@ html:not([data-theme=dark]) :is(input,textarea)::placeholder{color:#626b7a;opaci
 html:not([data-theme=dark]) .free-badge{color:var(--green)}
 html:not([data-theme=dark]) .task-level.level-1{--level-color:#b43c32}
 html:not([data-theme=dark]) .task-level.level-2{--level-color:#806000}
+
+/* Readable supporting copy and a roomier desktop layout. */
+html:not([data-theme=dark]){--muted:#394150}
+html:not([data-theme=dark]) :is(.skill-tags span,.card-meta,.filter-caption,.task-level-title small,.task-path-top>span:last-child,.task-path-bottom>span,.task-status,.document-label,.document dt,.verification dt,.timeline span:not(.complete),footer>span){color:#394150}
+.internship-card p,.track-card p,.intro-value-grid p,.intro-proof p,.support-contact p,.intro-faq details p,.process-preview>p,.task-item p,.task-modal p,.task-modal li{font-size:15px}
+.internship-card .skill-tags span,.skill-tags span,.internship-category,.internship-free,.free-badge,.card-meta,.internship-card .card-meta,.internship-card .card-link,.task-status,.task-level-title small,.task-path-top>span:last-child,.task-path-bottom,.video-resource small,.language-label small,.process-step small,.process-preview-top>span,.intro-price>span,.intro-price small,.intro-last p,.support-pending,footer p,footer>span,footer .text-link{font-size:13px}
+.intro-strip>.container{font-size:14px}.intro-strip b{font-size:12px;letter-spacing:.5px}
+.process-preview li,.support-contact .secondary,.task-item strong,.doc-resource,.video-resource strong{font-size:14px}
+.chat-message{font-size:14px}.chat-head small,.chat-message small,.chat-topics button,.chat-privacy{font-size:12px}
+@media(min-width:1200px){.container{max-width:1480px;width:calc(100% - 128px)}.container.narrow{max-width:750px}.nav-wrap{max-width:1608px;padding-inline:64px}.intro-about{gap:100px}.intro-support{gap:100px}}
