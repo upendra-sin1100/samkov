@@ -76,3 +76,9 @@ No cloud accounts or live payment credentials are provisioned by this repository
 Frontend components use `.jsx` and shared modules use `.js`. `npm run check` checks JavaScript/JSX syntax; the production build verifies module imports and routes. TypeScript remains a development tool for these checks, not the application source language.
 
 Apply `python -m backend.manage migrate` to existing databases before deploying these changes. The repeatable migrations preserve approved evidence, prevent changes to submission ownership, and retain existing learner data. Reviews accept pending submissions only and reject stale concurrent decisions.
+
+## Profile and enrollment update
+
+Users can edit their SamkovAI display name and student/employee/other details in **My profile**. Enrollment reuses saved details, asks students for their college and employees for their company, and limits the reason for joining to 15 words. Profile changes do not rewrite existing applications or issued documents. Clerk continues to manage login and email; directory sync preserves a locally edited display name.
+
+Before deploying this version against an existing database, run `python -m backend.manage migrate` to apply `004_editable_profiles.sql` (along with any earlier migrations). Run it before starting the updated API. New databases initialized with `init` include these fields already. No hosting or authentication provider change is required.

@@ -60,3 +60,11 @@ create table if not exists public.view_receipts(id uuid primary key, seen_at tim
 alter table public.profiles add column if not exists last_seen_at timestamptz;
 create index if not exists profiles_last_seen on public.profiles(last_seen_at);
 revoke all on public.site_views, public.view_receipts from public;
+
+-- Preserve existing application snapshots and user-selected display names.
+alter table public.profiles add column if not exists display_name_custom boolean not null default false;
+alter table public.profiles add column if not exists occupation text check (occupation in ('student','employee','other'));
+alter table public.profiles add column if not exists college text not null default '';
+alter table public.profiles add column if not exists company text not null default '';
+alter table public.applications add column if not exists occupation text not null default 'student' check (occupation in ('student','employee','other'));
+alter table public.applications add column if not exists company text not null default '';

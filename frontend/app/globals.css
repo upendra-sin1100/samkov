@@ -155,3 +155,13 @@ html:not([data-theme=dark]) :is(.skill-tags span,.card-meta,.filter-caption,.tas
 .process-preview li,.support-contact .secondary,.task-item strong,.doc-resource,.video-resource strong{font-size:14px}
 .chat-message{font-size:14px}.chat-head small,.chat-message small,.chat-topics button,.chat-privacy{font-size:12px}
 @media(min-width:1200px){.container{max-width:1480px;width:calc(100% - 128px)}.container.narrow{max-width:750px}.nav-wrap{max-width:1608px;padding-inline:64px}.intro-about{gap:100px}.intro-support{gap:100px}}
+
+/* Compact support and consistent personal details forms. */
+.support-widget{right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom))}
+.chat-launcher{width:44px;height:44px;min-width:44px;min-height:44px;justify-content:center;padding:0;border-radius:50%;box-shadow:0 3px 12px #14274e25}
+.chat-launcher>span{display:none}.chat-launcher svg{width:19px;height:19px}
+.personal-form-heading{display:flex;gap:14px;align-items:center;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.personal-form-heading>svg{flex-shrink:0;color:var(--blue)}.personal-form-heading h2{font-size:20px;margin:0}.personal-form-heading p{font-size:14px;margin:5px 0 0}
+.profile-form{max-width:680px}.profile-note{font-size:13px;line-height:1.6;margin:0;padding:14px;border-radius:10px;background:var(--surface)}
+.form-panel label>small,.word-count{color:var(--muted);font-size:12px;font-weight:400}.word-count{margin-top:-12px;text-align:right}.word-count.over-limit{color:#b42318}
+html[data-theme=dark] .word-count.over-limit{color:#ffaaa2}.form-panel input[readonly]{color:var(--muted)}

@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, FileResponse
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator, field_validator
 from .security import level_unlocked, secure_url, project_url
 
 load_dotenv(Path(__file__).resolve().parent / '.env')
@@ -37,13 +37,34 @@ async def unexpected_error(request, exc):
 @app.exception_handler(ValueError)
 async def value_error(request, exc): return JSONResponse({'error':str(exc) if not isinstance(exc,ValidationError) else 'Please check the required fields and URLs.'},status_code=422)
 
-class ApplicationInput(BaseModel):
+class ProfileInput(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
-    track_slug:str=Field(min_length=2,max_length=80,pattern=r'^[a-z0-9-]+$')
     name:str=Field(min_length=2,max_length=100)
-    college:str=Field(min_length=2,max_length=200)
-    motivation:str=Field(min_length=30,max_length=1500)
+    occupation:str=Field(pattern=r'^(student|employee|other)$')
+    college:str=Field(default='',max_length=200)
+    company:str=Field(default='',max_length=200)
+
+    @model_validator(mode='after')
+    def organization(self):
+        if self.occupation=='student' and len(self.college)<2:
+            raise ValueError('Enter your college or institution.')
+        if self.occupation=='employee' and len(self.company)<2:
+            raise ValueError('Enter your company name.')
+        if self.occupation!='student': self.college=''
+        if self.occupation!='employee': self.company=''
+        return self
+
+class ApplicationInput(ProfileInput):
+    track_slug:str=Field(min_length=2,max_length=80,pattern=r'^[a-z0-9-]+$')
+    motivation:str=Field(min_length=1,max_length=1500)
     start_date:date
+
+    @field_validator('motivation')
+    @classmethod
+    def word_limit(cls, value):
+        if len(value.split())>15:
+            raise ValueError('Use 15 words or fewer for your reason for joining.')
+        return value
 class SubmissionInput(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
     application_id:UUID
@@ -125,14 +146,18 @@ async def platform(request:Request):
         for table in ['applications','submissions','certificates']:
             data[table]=await database(table,params={} if admin else {'user_id':'eq.'+user['id']})
         data['resources']=await database('resources')
+        data['profile']=await database('profiles',params={'id':'eq.'+user['id'],'select':'id,display_name,occupation,college,company'},one=True)
         data['isAdmin']=admin
         if admin: data['users']=await database('profiles',params={'select':'id,email,display_name,username,role,disabled'})
         return data
-    if action=='apply':
+    if action=='update_profile':
+        p=ProfileInput.model_validate(b)
+        await database('profiles','PATCH',params={'id':'eq.'+user['id']},body={'display_name':p.name,'display_name_custom':True,'occupation':p.occupation,'college':p.college,'company':p.company})
+    elif action=='apply':
         p=ApplicationInput.model_validate(b)
         if p.start_date<date.today(): raise HTTPException(422,'Choose a valid future start date.')
         await database('tracks',params={'slug':'eq.'+p.track_slug,'active':'eq.true'},one=True)
-        await database('applications','POST',body={'user_id':user['id'],'track_slug':p.track_slug,'student_name':p.name.strip(),'college':p.college.strip(),'motivation':p.motivation.strip(),'start_date':str(p.start_date)})
+        await database('applications','POST',body={'user_id':user['id'],'track_slug':p.track_slug,'student_name':p.name,'occupation':p.occupation,'college':p.college,'company':p.company,'motivation':p.motivation,'start_date':str(p.start_date)})
     elif action=='submit':
         p=SubmissionInput.model_validate(b)
         project_url(p.github_url)

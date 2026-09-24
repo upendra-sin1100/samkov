@@ -25,7 +25,9 @@ def save_users(users):
         for fields in values:
             conn.execute('''INSERT INTO public.profiles(auth_subject,email,display_name,username)
                 VALUES (%s,%s,%s,%s) ON CONFLICT(auth_subject) DO UPDATE SET
-                email=EXCLUDED.email,display_name=EXCLUDED.display_name,username=EXCLUDED.username''', fields)
+                email=EXCLUDED.email,
+                display_name=CASE WHEN profiles.display_name_custom THEN profiles.display_name ELSE EXCLUDED.display_name END,
+                username=EXCLUDED.username''', fields)
     return len(values)
 
 def sync_directory(force=False):
