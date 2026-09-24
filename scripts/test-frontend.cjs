@@ -19,7 +19,7 @@ const compiled = ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKin
 new Function('module','exports',compiled)(moduleResult,moduleResult.exports);
 const {selectApplication,certificatesForApplication,certificateIdFromPath} = moduleResult.exports;
 const applications = [{id:'python-app',track_slug:'python',status:'approved'},{id:'web-app',track_slug:'web-development',status:'completed'}];
-for(const route of ['tasks','learn','submit','apply','internships']) {
+for(const route of ['dashboard','offer','certificate','tasks','learn','submit','apply','internships']) {
  assert.equal(selectApplication(applications,`/${route}/machine-learning`,'python-app'),undefined);
  assert.equal(selectApplication(applications,`/${route}/web-development`,'python-app').id,'web-app');
 }
@@ -33,3 +33,6 @@ assert.deepEqual(certificatesForApplication(certificates),[]);
 assert.equal(certificateIdFromPath('/verify/SKAI%2D2026'),'SKAI-2026');
 assert.equal(certificateIdFromPath('/verify/%invalid'),'');
 console.log('PASS: track isolation, internship selection, certificate scope, and verification URL parsing.');
+
+assert.equal(selectApplication([...applications,{id:'second',track_slug:'ai',status:'approved'}],'/dashboard'),undefined);
+assert.equal(selectApplication([applications[1]],'/dashboard'),undefined);

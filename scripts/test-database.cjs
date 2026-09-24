@@ -17,6 +17,10 @@ const assert=require('node:assert/strict');
   await assert.rejects(submit(0,other),/Application not open/);
   for(let i=0;i<6;i++){
    await submit(i);
+   await assert.rejects(db.query("INSERT INTO submissions(application_id,user_id,project_index,github_url,notes) VALUES ($1,$2,$3,'https://example.com','Duplicate pending project evidence') ON CONFLICT(application_id,project_index) DO UPDATE SET notes=EXCLUDED.notes",[app,student,i]),/under review/);
+   await assert.rejects(db.query("UPDATE submissions SET notes='duplicate evidence' WHERE application_id=$1 AND project_index=$2",[app,i]),/under review/);
+   await db.query("UPDATE submissions SET status='rejected',feedback='Please add validation' WHERE application_id=$1 AND project_index=$2",[app,i]);
+   await db.query("UPDATE submissions SET status='pending',notes='Revised evidence with validation' WHERE application_id=$1 AND project_index=$2",[app,i]);
    await db.query("UPDATE submissions SET status='approved' WHERE application_id=$1 AND project_index=$2",[app,i]);
   }
   await assert.rejects(db.query("UPDATE submissions SET notes='tampered' WHERE application_id=$1 AND project_index=0",[app]),/immutable/);
@@ -39,6 +43,8 @@ const assert=require('node:assert/strict');
   await db.exec(fs.readFileSync('backend/migrations/003_account_directory.sql','utf8'));
   await db.exec(fs.readFileSync('backend/migrations/004_editable_profiles.sql','utf8'));
   await db.exec(fs.readFileSync('backend/migrations/004_editable_profiles.sql','utf8'));
+  await db.exec(fs.readFileSync('backend/migrations/005_pending_submission_lock.sql','utf8'));
+  await db.exec(fs.readFileSync('backend/migrations/005_pending_submission_lock.sql','utf8'));
   await db.query("UPDATE profiles SET display_name='Chosen Name',display_name_custom=true,occupation='other',college='',company='' WHERE id=$1",[other]);
   const directorySource=fs.readFileSync('backend/directory.py','utf8');
   let syncIndex=0;

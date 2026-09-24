@@ -80,7 +80,7 @@ Generate the secret locally and paste it into Railway variables. Do not commit i
 ## 5. Confirm the release
 
 1. Sign in and open the student dashboard; verify saved applications load.
-2. If retaining the current Clerk instance, the existing administrator role remains. If switching instances, sign in first and assign the intended administrator with `python -m backend.manage make-admin --clerk-user-id user_THE_VERIFIED_ADMIN_ID` using the production database environment.
+2. All previous accounts, including the admin, were reset. Sign up and sign in first, then assign the intended administrator with `python -m backend.manage make-admin --clerk-user-id user_THE_VERIFIED_ADMIN_ID` using the production database environment.
 3. Open `/admin` (not `/admin/preview`) and verify account names/emails load.
 4. Submit an HTTP/HTTPS project link on an approved internship. Confirm redirection to the dashboard and the pending submission.
 5. Review it as admin, resize the details panel, and confirm the student sees the feedback.
@@ -89,3 +89,13 @@ Generate the secret locally and paste it into Railway variables. Do not commit i
 The repository includes host configuration, not provisioned Vercel/Railway services. Add the variables through each hosting dashboard; local `.env` files stay on your computer.
 
 References: [Vercel monorepos](https://vercel.com/docs/monorepos), [outside-root sources](https://vercel.com/docs/monorepos/monorepo-faq), [Railway configuration](https://docs.railway.com/config-as-code/reference), [Railway health checks](https://docs.railway.com/deployments/healthchecks), [pre-deploy commands](https://docs.railway.com/deployments/pre-deploy-command).
+
+## Custom domain launch
+
+1. Buy the chosen domain after checking its renewal price. Add it in Vercel project Settings → Domains, then enter the DNS records Vercel gives you at your registrar. Select one canonical host and redirect the other (`www` or apex) to it.
+2. Set `NEXT_PUBLIC_SITE_URL=https://YOUR-DOMAIN` in both Vercel and Railway. Set Railway `CLERK_AUTHORIZED_PARTIES` to exactly that origin. `VERIFICATION_SITE_URL` should be unset so QR codes follow the same site URL; remove any old override.
+3. Configure the same domain in the production Clerk instance and finish its DNS, email, and Google sign-in requirements. Replace all three Clerk settings with the matching production instance values.
+4. Redeploy both services. The frontend URL is embedded at build time, so updating variables without redeploying does not update printed links.
+5. Before accepting real students, test sign-up, admin assignment, application approval, a submission and review, and both document verification links on the final HTTPS domain. Do not issue real documents using a temporary preview domain.
+
+The code supports either `.me` or `.tech`; no domain is purchased by this repository. File upload controls appear only when the backend has uploads enabled. Real support is not connected: the support widget is an automated guide. Publish your privacy/terms information and a monitored contact channel before collecting public applications.

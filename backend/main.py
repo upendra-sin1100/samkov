@@ -21,6 +21,7 @@ load_dotenv(Path(__file__).resolve().parent / '.env')
 load_dotenv(Path(__file__).resolve().parents[1] / '.env.local')
 app = FastAPI(title='SamkovAI API', version='1.0.0')
 SITE_URL = os.getenv('NEXT_PUBLIC_SITE_URL', 'http://localhost:3000').rstrip('/')
+VERIFICATION_SITE_URL = (os.getenv('VERIFICATION_SITE_URL') or SITE_URL).rstrip('/')
 app.add_middleware(CORSMiddleware, allow_origins=[SITE_URL], allow_methods=['GET','POST'], allow_headers=['Authorization','Content-Type'])
 
 from .db import database, record_visit, touch_user, analytics_snapshot
@@ -97,16 +98,29 @@ async def health(): return {'status':'ok','backend':'Python / FastAPI','configur
 
 @app.get('/api/verify')
 async def verify(id:str):
-    if not re.fullmatch(r'SKAI-\d{4}-[A-F0-9]{32}',id): return JSONResponse({'certificate':None},status_code=404)
-    records=await database('certificates',params={'id':'eq.'+id,'select':'id,student_name,track_title,domain,duration_weeks,completed_at,status,projects_completed'})
-    return JSONResponse({'certificate':records[0] if records else None},status_code=200 if records else 404,headers={'Cache-Control':'no-store'})
+    document=await public_document(id.strip().upper())
+    return JSONResponse({'document':document,'certificate':document if document and document['type']=='certificate' else None},status_code=200 if document else 404,headers={'Cache-Control':'no-store'})
+
+async def public_document(document_id):
+    if re.fullmatch(r'SKAI-\d{4}-[A-F0-9]{32}',document_id):
+        records=await database('certificates',params={'id':'eq.'+document_id,'select':'id,student_name,track_title,domain,duration_weeks,start_date,end_date,completed_at,issued_at,status,projects_completed'})
+        return {**records[0],'type':'certificate'} if records else None
+    if re.fullmatch(r'SKAI-OL-[A-F0-9]{32}',document_id):
+        records=await database('applications',params={'verification_id':'eq.'+str(UUID(document_id[8:])),'select':'student_name,track_slug,start_date,end_date,status'})
+        if not records or records[0]['status'] not in ['approved','completed']: return None
+        offer=records[0]
+        track=await database('tracks',params={'slug':'eq.'+offer['track_slug'],'select':'title,weeks'},one=True)
+        return {'id':document_id,'type':'offer','student_name':offer['student_name'],'track_title':track['title'],'duration_weeks':track['weeks'],'start_date':offer['start_date'],'end_date':offer['end_date'],'status':'issued'}
+    return None
 
 @app.get('/api/qr')
 async def qr(id:str):
-    if not re.fullmatch(r'SKAI-\d{4}-[A-F0-9]{32}',id): raise HTTPException(400,'Invalid certificate ID.')
+    id=id.strip().upper()
+    if not re.fullmatch(r'SKAI-(?:\d{4}-|OL-)[A-F0-9]{32}',id): raise HTTPException(400,'Invalid document ID.')
+    if not await public_document(id): raise HTTPException(404,'Document not found.')
     buffer=io.BytesIO()
-    qrcode.make(SITE_URL+'/verify/'+id,image_factory=qrcode.image.svg.SvgPathImage).save(buffer)
-    return Response(buffer.getvalue(),media_type='image/svg+xml',headers={'Cache-Control':'public, max-age=86400'})
+    qrcode.make(VERIFICATION_SITE_URL+'/verify/'+id,image_factory=qrcode.image.svg.SvgPathImage).save(buffer)
+    return Response(buffer.getvalue(),media_type='image/svg+xml',headers={'Cache-Control':'no-store'})
 
 @app.post('/api/platform')
 async def platform(request:Request):
@@ -147,6 +161,7 @@ async def platform(request:Request):
             data[table]=await database(table,params={} if admin else {'user_id':'eq.'+user['id']})
         data['resources']=await database('resources')
         data['profile']=await database('profiles',params={'id':'eq.'+user['id'],'select':'id,display_name,occupation,college,company'},one=True)
+        data['uploads_enabled']=files.storage_mode() in ('local','s3')
         data['isAdmin']=admin
         if admin: data['users']=await database('profiles',params={'select':'id,email,display_name,username,role,disabled'})
         return data
@@ -167,6 +182,7 @@ async def platform(request:Request):
         if a['status']!='approved': raise HTTPException(409,'An approved, active internship is required.')
         t=await database('tracks',params={'slug':'eq.'+a['track_slug']},one=True)
         submissions=await database('submissions',params={'application_id':'eq.'+a['id']})
+        if any(s['project_index']==p.project_index and s['status']=='pending' for s in submissions): raise HTTPException(409,'This project is under review. Resubmit only after changes are requested.')
         approved=[s['project_index'] for s in submissions if s['status']=='approved']
         if not level_unlocked(p.project_index,t['project_count'],approved): raise HTTPException(409,'Complete the previous level before submitting this project.')
         if p.project_index in approved: raise HTTPException(409,'An approved project cannot be overwritten.')

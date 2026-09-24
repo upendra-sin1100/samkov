@@ -1,6 +1,10 @@
 export function selectApplication(applications, path, selectedId) {
-    if (/^\/(tasks|learn|submit|apply|internships)\//.test(path)) {
+    if (/^\/(dashboard|offer|certificate|tasks|learn|submit|apply|internships)\//.test(path)) {
         return applications.find(application => application.track_slug === path.split('/')[2]);
+    }
+    if (path === '/dashboard') {
+        const active = applications.filter(a => ['approved', 'pending'].includes(a.status));
+        return active.length === 1 ? active[0] : undefined;
     }
     return applications.find(application => application.id === selectedId)
         || applications.find(application => ['approved', 'completed'].includes(application.status))

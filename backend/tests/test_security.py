@@ -111,6 +111,20 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(response.status_code,200)
         self.assertEqual(response.json()['resources'],[resource])
         self.assertEqual(database.call_args_list[1].kwargs['params']['select'],'track_slug,title,url')
+    @patch('backend.main.database',new_callable=AsyncMock)
+    @patch('backend.main.identity',new_callable=AsyncMock)
+    def test_pending_project_cannot_be_resubmitted(self,identity,database):
+        uid='11111111-1111-4111-8111-111111111111'
+        identity.return_value=({'id':uid},False)
+        database.side_effect=[{'id':uid,'user_id':uid,'status':'approved','track_slug':'python'},
+            {'project_count':6},[{'project_index':0,'status':'pending'},{'project_index':1,'status':'pending'}]]
+        response=self.client.post('/api/platform',json={'action':'submit','application_id':uid,
+            'project_index':0,'github_url':'https://github.com/student/project',
+            'notes':'Updated evidence that must not replace pending work'})
+        self.assertEqual(response.status_code,409)
+        self.assertIn('under review',response.json()['error'])
+        self.assertEqual(database.await_count,3)
+
     def test_health_identifies_python_backend(self):
         self.assertEqual(self.client.get('/api/health').json()['backend'],'Python / FastAPI')
     def test_unauthenticated_write_is_rejected(self):

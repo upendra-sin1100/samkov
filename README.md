@@ -82,3 +82,13 @@ Apply `python -m backend.manage migrate` to existing databases before deploying 
 Users can edit their SamkovAI display name and student/employee/other details in **My profile**. Enrollment reuses saved details, asks students for their college and employees for their company, and limits the reason for joining to 15 words. Profile changes do not rewrite existing applications or issued documents. Clerk continues to manage login and email; directory sync preserves a locally edited display name.
 
 Before deploying this version against an existing database, run `python -m backend.manage migrate` to apply `004_editable_profiles.sql` (along with any earlier migrations). Run it before starting the updated API. New databases initialized with `init` include these fields already. No hosting or authentication provider change is required.
+
+## Multiple internships and submission review
+
+The dashboard opens the only current internship or offers a chooser for multiple current applications. Completed internships remain in My profile, with certificate and workspace access. Workspace URLs include the track; submission URLs also include the project index, preserving the panel on reload. Admin personal views use only the administrator's own enrollments.
+
+Run `python -m backend.manage migrate` before deploying to apply `005_pending_submission_lock.sql`. Both the API and PostgreSQL reject replacement of pending evidence, including conflicting inserts; reviewers can request changes to permit resubmission. Approved evidence stays immutable.
+
+Offer and certificate verification share `/verify`; the offer's full SKAI-OL ID is its public internship document ID. Document dates use DD/MM/YYYY.
+
+`scripts/reset-accounts.py` is an operator-only dry run unless `--delete-all-accounts` is explicitly supplied. It permanently removes all accounts in the configured Clerk instance and associated learner records from the configured database, including admin access, while preserving curriculum and resource links. After a reset, sign up again and use the existing `make-admin` command to assign the new administrator. The script stops if submission attachments need storage cleanup.
