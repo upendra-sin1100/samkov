@@ -59,7 +59,7 @@ class FileTests(unittest.TestCase):
             params=parse_qs(urlparse(files.signed_url_sync(key)).query)
             expires=int(params['expires'][0]);signature=params['signature'][0]
             self.assertTrue(files.authorize_download(key,expires,signature).is_file())
-            for bad_key,bad_exp,bad_sig in [(key,expires-300,signature),(key,expires,'x'*64),(key.replace('11111111','22222222'),expires,signature)]:
+            for bad_key,bad_exp,bad_sig in [(key,expires-300,signature),(key,expires,'x'*64),(key,expires,'é'*64),(key.replace('11111111','22222222'),expires,signature)]:
                 with self.assertRaises(HTTPException):files.authorize_download(bad_key,bad_exp,bad_sig)
     def test_rejects_traversal_and_disguised_uploads(self):
         for key in ['../secret','11111111-1111-4111-8111-111111111111/../secret']:

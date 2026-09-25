@@ -75,7 +75,7 @@ def signed_url_sync(key):
 def authorize_download(key,expires,signature):
     valid_key(key)
     expected=hmac.new(signing_secret(),f'{key}:{expires}'.encode(),hashlib.sha256).hexdigest()
-    if expires<int(time.time()) or expires>int(time.time())+120 or not hmac.compare_digest(expected,signature):
+    if not re.fullmatch(r'[a-f0-9]{64}',signature) or expires<int(time.time()) or expires>int(time.time())+120 or not hmac.compare_digest(expected,signature):
         raise HTTPException(403,'This file link has expired or is invalid.')
     path=local_path(key)
     if not path.is_file(): raise HTTPException(404,'File unavailable.')

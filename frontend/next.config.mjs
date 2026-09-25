@@ -3,6 +3,15 @@ import { PHASE_DEVELOPMENT_SERVER } from 'next/constants.js';
 
 /** Frontend-only app: all /api requests are forwarded to the Python service. */
 const config = {
+  poweredByHeader: false,
+  async headers() {
+    return [{ source: '/:path*', headers: [
+      { key: 'X-Content-Type-Options', value: 'nosniff' },
+      { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+      { key: 'X-Frame-Options', value: 'DENY' },
+      { key: 'Content-Security-Policy', value: "frame-ancestors 'none'; object-src 'none'; base-uri 'self'" },
+    ] }];
+  },
   outputFileTracingRoot: fileURLToPath(new URL('../', import.meta.url)),
   webpack(webpackConfig) {
     // Ignore these before Watchpack tries to stat protected Windows files.

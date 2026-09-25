@@ -1,6 +1,7 @@
 """SamkovAI FastAPI backend. Business logic lives here, never in Next.js routes."""
 import asyncio
 import io
+import json
 import logging
 import os
 import re
@@ -28,6 +29,28 @@ from .db import database, record_visit, touch_user, analytics_snapshot
 from .auth import identity
 from .directory import sync_directory
 from . import files
+
+@app.middleware('http')
+async def private_response_headers(request, call_next):
+    response = await call_next(request)
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['Referrer-Policy'] = 'no-referrer'
+    # Account data, signed download URLs, and errors must never enter shared caches.
+    if request.url.path == '/api/platform' or request.url.path.startswith('/api/files'):
+        response.headers['Cache-Control'] = 'private, no-store'
+    return response
+
+async def platform_body(request):
+    """Bound authenticated JSON before parsing, including chunked requests."""
+    body = bytearray()
+    async for chunk in request.stream():
+        if len(body) + len(chunk) > 64 * 1024:
+            raise HTTPException(413, 'Request is too large.')
+        body.extend(chunk)
+    try:
+        return json.loads(body)
+    except (ValueError, UnicodeError, RecursionError) as exc:
+        raise HTTPException(422, 'Provide a valid JSON request.') from exc
 
 @app.exception_handler(HTTPException)
 async def http_error(request, exc): return JSONResponse({'error':exc.detail},status_code=exc.status_code)
@@ -127,7 +150,7 @@ async def platform(request:Request):
     origin=request.headers.get('origin')
     if origin and origin!=SITE_URL: raise HTTPException(403,'Untrusted request origin.')
     user,admin=await identity(request)
-    b=await request.json()
+    b=await platform_body(request)
     if not isinstance(b, dict): raise HTTPException(422, 'Request body must be a JSON object.')
     action=b.get('action')
     if not isinstance(action, str): raise HTTPException(422, 'Provide a valid action.')

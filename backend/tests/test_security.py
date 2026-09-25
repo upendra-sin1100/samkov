@@ -39,6 +39,40 @@ class ApiTests(unittest.TestCase):
     def setUp(self): self.client=TestClient(app)
     @patch('backend.main.database',new_callable=AsyncMock)
     @patch('backend.main.identity',new_callable=AsyncMock)
+    def test_workspace_keeps_student_records_private(self,identity,database):
+        uid='11111111-1111-4111-8111-111111111111'
+        identity.return_value=({'id':uid},False)
+        database.side_effect=[[],[],[],[],{'id':uid}]
+        response=self.client.post('/api/platform',json={'action':'workspace'})
+        self.assertEqual(response.status_code,200)
+        self.assertFalse(response.json()['isAdmin'])
+        self.assertNotIn('users',response.json())
+        for call in database.call_args_list[:3]:
+            self.assertEqual(call.kwargs['params'],{'user_id':'eq.'+uid})
+        self.assertEqual(response.headers['cache-control'],'private, no-store')
+
+    @patch('backend.main.database',new_callable=AsyncMock)
+    @patch('backend.main.identity',new_callable=AsyncMock)
+    def test_json_body_size_and_malformed_encoding_are_rejected(self,identity,database):
+        identity.return_value=({'id':'11111111-1111-4111-8111-111111111111'},False)
+        for body in [b'{', b'\xff', b'['*2000+b']'*2000]:
+            response=self.client.post('/api/platform',content=body)
+            self.assertEqual(response.status_code,422)
+        response=self.client.post('/api/platform',content=b' '*65537)
+        self.assertEqual(response.status_code,413)
+        # Omitting Content-Length must not bypass the streaming limit.
+        response=self.client.post('/api/platform',content=iter([b' '*32768,b' '*32769]))
+        self.assertEqual(response.status_code,413)
+        database.assert_not_called()
+
+    def test_private_errors_are_not_cacheable(self):
+        response=self.client.post('/api/platform',json={'action':'workspace'})
+        self.assertEqual(response.status_code,401)
+        self.assertEqual(response.headers['cache-control'],'private, no-store')
+        self.assertEqual(response.headers['x-content-type-options'],'nosniff')
+
+    @patch('backend.main.database',new_callable=AsyncMock)
+    @patch('backend.main.identity',new_callable=AsyncMock)
     def test_reviews_reject_already_reviewed_and_concurrent_updates(self,identity,database):
         uid='11111111-1111-4111-8111-111111111111'
         identity.return_value=({'id':uid},True)
