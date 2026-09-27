@@ -91,3 +91,15 @@
 .certificate-edition{right:230px}
 @media screen and (max-width:500px){.certificate-edition{display:none}.certificate-art:before{height:22px}}
 @media print{.certificate-art:before{height:7mm}.certificate-edition{right:60mm}}
+/* Strong text contrast for print, screenshots, and professional sharing. */
+.program-certificate p,.program-certificate li,.program-certificate small,.program-certificate .certificate-award .award-intro,.program-certificate .certificate-completed{color:#202b33!important}
+.program-certificate .program-doc-title>span,.program-certificate .program-doc-title p,.program-certificate .document-motto,.program-certificate .document-motto>span,.program-certificate .issuer-kicker,.program-certificate .program-issuer>span,.program-certificate .certificate-dates>span{color:#293640!important;font-weight:600}
+.program-certificate .program-issuer>small,.program-certificate .document-verification p,.program-certificate .document-verification small,.program-certificate .document-verification code{color:#202b33!important}
+.program-certificate .program-disclaimer{color:#293640!important;font-size:8px!important;line-height:1.6;font-weight:500}
+.program-certificate .document-bottomline a{color:#202b33!important;font-weight:600}
+.program-certificate .certificate-edition{color:#293640;font-weight:600}
+.program-certificate .certificate-award .certificate-recognition{font-weight:500}
+/* Anchor the folded ribbon to the corner instead of leaving a floating strip. */
+.certificate-art:after{width:76px;height:76px;background:linear-gradient(135deg,transparent 0 48%,#ff681f 48% 61%,#142a39 61% 73%,#ff681f 73%);clip-path:polygon(0 100%,100% 0,100% 100%)}
+@media screen and (max-width:500px){.certificate-art:after{width:34px;height:34px}}
+@media print{.certificate-art:after{width:18mm;height:18mm}.program-certificate .program-disclaimer{font-size:8px!important}}
