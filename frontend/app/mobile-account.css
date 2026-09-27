@@ -1,0 +1,27 @@
+/* Keep both account actions visible, with a dedicated row on small phones. */
+nav .mobile-account-link{display:none}
+@media(max-width:800px){
+  nav.open .mobile-account-link{display:flex}
+  .nav-actions .account-entry{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 4px;white-space:nowrap;font-size:13px;font-weight:700}
+  .nav-actions{flex-shrink:0}
+  .nav-actions .menu-button{min-width:44px;min-height:44px}
+}
+@media(max-width:600px){
+  html{scroll-padding-top:140px}
+  header{height:128px}
+  .nav-wrap{display:grid;grid-template-columns:minmax(0,1fr) 44px 44px;grid-template-rows:60px 44px;gap:8px;padding:4px 16px 12px}
+  .nav-wrap>.samkov-brand{grid-column:1;grid-row:1}
+  .nav-actions{display:contents}
+  .nav-actions .theme-toggle{grid-column:2;grid-row:1;width:44px;height:44px}
+  .nav-actions .menu-button{grid-column:3;grid-row:1}
+  .nav-actions .account-entry{grid-column:1;grid-row:2;border:1px solid var(--line);border-radius:7px}
+  .nav-actions .primary.small{display:inline-flex;grid-column:2 / 4;grid-row:2;min-height:44px;padding:8px;white-space:nowrap;font-size:12px}
+  .nav-actions .primary.small svg{display:none}
+  nav.open{top:100%;max-height:calc(100dvh - 128px)}
+}
+@media(max-width:380px){
+  header .samkov-brand{gap:7px}
+  header .samkov-wordmark{padding-left:7px}
+  header .samkov-wordmark strong{font-size:14px;letter-spacing:1px}
+  header .samkov-wordmark small{font-size:5px;letter-spacing:.6px}
+}

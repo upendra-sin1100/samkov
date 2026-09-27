@@ -51,7 +51,7 @@ class DocumentVerificationTests(unittest.TestCase):
             database.reset_mock()
 
     @patch('backend.main.database', new_callable=AsyncMock)
-    @patch('backend.main.VERIFICATION_SITE_URL', 'https://samkovai.tech')
+    @patch('backend.main.VERIFICATION_SITE_URL', 'https://samkovai.me')
     @patch('backend.main.qrcode.make')
     def test_qr_targets_canonical_site_and_exact_record(self, make_qr, database):
         def write_svg(buffer): buffer.write(b'<svg/>')
@@ -59,7 +59,7 @@ class DocumentVerificationTests(unittest.TestCase):
         database.return_value = [{'id':CERT_ID,'status':'active'}]
         response = self.client.get('/api/qr', params={'id':CERT_ID})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(make_qr.call_args.args[0], 'https://samkovai.tech/verify/' + CERT_ID)
+        self.assertEqual(make_qr.call_args.args[0], 'https://samkovai.me/verify/' + CERT_ID)
         database.return_value = []
         make_qr.reset_mock()
         self.assertEqual(self.client.get('/api/qr', params={'id':CERT_ID}).status_code, 404)

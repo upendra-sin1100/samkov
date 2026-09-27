@@ -38,3 +38,56 @@
 
 @media print{.program-document .samkov-brand{display:inline-flex!important}.program-offer{min-height:296mm}.program-certificate{min-height:209mm}}
 @media screen and (max-width:380px){.program-certificate .program-doc-title h2{font-size:22px;letter-spacing:1.4px}}
+/* Keep the offer's contact details and program disclosure on its A4 page. */
+@media print{
+ .program-offer .program-doc-header{margin-bottom:4mm}
+ .program-offer .offer-facts{margin:4mm 0;padding:4mm;gap:4mm}
+ .program-offer>h3{margin-top:4mm}
+ .program-offer .program-doc-footer{margin-top:4mm;padding-top:4mm}
+ .program-offer .document-bottomline{margin-top:3mm}
+}
+
+/* Certificate: warm paper, ink-blue frame, copper linework and editorial typography. */
+.program-certificate{background:#fffdf7!important;padding:36px 66px 28px 88px!important;--doc-accent:#b36a32;--doc-line:#d8c9b4}
+.program-document>.certificate-art{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.certificate-spine{position:absolute;inset:0 auto 0 0;width:28px;background:#142a39;border-right:4px solid #ff681f;display:flex;align-items:center;justify-content:center}
+.certificate-spine span{writing-mode:vertical-rl;transform:rotate(180deg);font:9px Arial,sans-serif;letter-spacing:5px;color:#efe4cf;white-space:nowrap}
+.certificate-frame{position:absolute;inset:16px 18px 16px 42px;border:1px solid #e29a70}
+.certificate-frame:after{content:'';position:absolute;inset:5px;border:1px solid #ded3bf}
+.certificate-orbits{position:absolute;width:610px;height:610px;right:-305px;top:-245px;fill:none;stroke:#b77846;stroke-width:.7;opacity:.3}
+.certificate-edition{position:absolute;bottom:23px;right:36px;font:6px Arial,sans-serif;letter-spacing:2px;color:#81735f}
+.program-certificate .program-doc-header{padding-left:0;min-height:68px;margin-bottom:10px}
+.program-certificate .samkov-symbol{height:60px!important;width:34px!important}
+.program-certificate .samkov-wordmark strong{font-size:23px!important;letter-spacing:3px!important}
+.program-certificate .document-motto{color:#334853;letter-spacing:2px}
+.program-certificate .program-doc-title{margin:14px 0 20px}
+.program-certificate .program-doc-title>span{font-size:7px;letter-spacing:3px;color:#806443}
+.program-certificate .program-doc-title h2{font-family:Georgia,'Times New Roman',serif;font-weight:400;font-size:clamp(40px,7vw,78px);letter-spacing:-2px;color:#142a39!important;margin:6px 0 8px!important}
+.program-certificate .program-doc-title p{font-size:11px;letter-spacing:4px;color:#63543f!important}
+.program-certificate .program-doc-title:after{height:1px;width:160px;background:linear-gradient(90deg,transparent,#b36a32,transparent);margin-top:16px}
+.program-certificate .certificate-award .award-intro{font-size:12px;color:#6b6c69!important}
+.program-certificate .certificate-award h3{font-size:clamp(30px,4vw,46px);font-style:italic;color:#183445!important;border-bottom:1px solid #c9b290;max-width:620px;padding-bottom:12px;margin:10px auto 12px}
+.program-certificate .certificate-award h4{font-size:21px;letter-spacing:.2px;color:#183445}
+.program-certificate .certificate-award p{font-size:12px}
+.program-certificate .certificate-dates{margin:12px auto!important;display:table;border-block:1px solid #e3d7c6;padding:7px 18px}
+.program-certificate .certificate-recognition{font-size:11px!important}
+.program-certificate .certificate-completed{font-size:9px!important}
+.program-certificate .program-doc-footer{border-top:1px solid #d8c9b4;padding-top:18px;margin-top:20px;gap:26px}
+.program-certificate .document-seal{filter:sepia(.45);width:98px;height:98px}
+.program-certificate .document-bottomline{margin-top:14px;padding-top:10px}
+.program-certificate .program-disclaimer{color:#625f58!important;max-width:100%;margin-bottom:10px}
+@media screen and (max-width:850px){.program-certificate{padding:32px 32px 30px 58px!important}.program-certificate .program-doc-footer{grid-template-columns:minmax(0,1fr) 90px}.program-certificate .document-seal{width:90px;height:90px}.certificate-spine{width:20px}.certificate-frame{left:30px;right:10px}.certificate-edition{font-size:5px;letter-spacing:1px;bottom:20px}.program-certificate .document-verification{padding-top:14px}}
+@media screen and (max-width:500px){.program-certificate{padding:32px 22px 32px 38px!important}.certificate-spine{width:12px;border-right-width:2px}.certificate-spine span{font-size:6px;letter-spacing:3px}.certificate-frame{left:20px;right:8px;inset-block:10px}.certificate-frame:after{inset:3px}.program-certificate .samkov-wordmark strong{font-size:16px!important;letter-spacing:1px!important}.program-certificate .samkov-symbol{height:46px!important;width:26px!important}.program-certificate .program-doc-title h2{font-size:40px;letter-spacing:-1px}.program-certificate .program-doc-title>span{font-size:6px;letter-spacing:1px}.program-certificate .program-doc-title p{font-size:8px;letter-spacing:2px}.program-certificate .certificate-award h3{font-size:30px}.program-certificate .certificate-award h4{font-size:18px}.program-certificate .certificate-dates{font-size:10px!important;padding:6px}.program-certificate .program-doc-footer{gap:14px}.program-certificate .document-bottomline{gap:6px}.certificate-orbits{opacity:.18}}
+@media print{.program-certificate{padding:9mm 15mm 10mm 21mm!important;min-height:209mm}.certificate-spine{width:7mm}.certificate-frame{inset:4mm 5mm 4mm 10mm}.certificate-edition{bottom:6mm}.program-certificate .program-doc-header{min-height:17mm;margin-bottom:2mm}.program-certificate .program-doc-title{margin:3mm 0 4mm}.program-certificate .program-doc-title h2{font-size:64px}.program-certificate .program-doc-title p{font-size:10px;letter-spacing:4px}.program-certificate .certificate-award h3{font-size:38px;margin:2mm auto 3mm;padding-bottom:3mm}.program-certificate .certificate-award p{margin:2mm 0}.program-certificate .certificate-dates{margin:3mm auto!important}.program-certificate .program-doc-footer{grid-template-columns:minmax(0,1fr) 25mm minmax(0,1.3fr);margin-top:4mm;padding-top:4mm;gap:6mm}.program-certificate .document-seal{width:25mm;height:25mm}.program-certificate .document-bottomline{margin-top:3mm;padding-top:2mm}.program-certificate .program-disclaimer{margin-top:2mm;margin-bottom:0}}
+/* Angular orange ribbons echo the folded strokes of the SamkovAI logo. */
+.certificate-art:before,.certificate-art:after{content:'';position:absolute;z-index:1;width:210px;height:68px;right:0;background:linear-gradient(135deg,transparent 0 36%,#ff681f 36% 51%,#142a39 51% 62%,#ff681f 62% 67%,transparent 67%);pointer-events:none}
+.certificate-art:before{top:0;transform:scaleY(-1)}
+.certificate-art:after{bottom:0}
+.certificate-frame:before{content:'';position:absolute;left:-1px;top:28%;height:44%;width:3px;background:linear-gradient(#ff681f 0 42%,transparent 42% 47%,#ff681f 47% 68%,transparent 68% 73%,#ff681f 73%)}
+@media screen and (max-width:500px){.certificate-art:before,.certificate-art:after{width:92px;height:28px}}
+@media print{.certificate-art:before,.certificate-art:after{width:50mm;height:12mm}}
+/* Leave the header motto and edition label clear of the corner ribbons. */
+.certificate-art:before{height:30px}
+.certificate-edition{right:230px}
+@media screen and (max-width:500px){.certificate-edition{display:none}.certificate-art:before{height:22px}}
+@media print{.certificate-art:before{height:7mm}.certificate-edition{right:60mm}}

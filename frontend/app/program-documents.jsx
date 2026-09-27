@@ -6,7 +6,7 @@ import Brand from './brand';
 const documentOrigin = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/\/+$/, '');
 const documentHost = new URL(documentOrigin).host;
 
-export const programStatement = 'An independent SamkovAI project-based learning program. This document does not certify employment or claim government recognition, accreditation, or affiliation with any other company.';
+export const programStatement = 'SamkovAI is an independent project-based internship and learning program, not a registered company. This document does not certify employment or claim government recognition, accreditation, or affiliation with any other company.';
 export function offerDocumentId(application) {
     return 'SKAI-OL-' + String(application.verification_id || '').replaceAll('-', '').toUpperCase();
 }
@@ -36,7 +36,7 @@ function VerificationCode({ id }) {
     </div>;
 }
 function DocumentFooter({ id, signatory, issuedAt }) {
-    return <><div className="program-doc-footer"><div className="program-issuer"><span className="issuer-kicker">LEARN. CREATE. PROGRESS.</span><strong>{signatory || 'SamkovAI Program Office'}</strong><span>Authorized program issuer</span>{issuedAt && <small>Date of issue · {documentDate(issuedAt)}</small>}</div><DocumentSeal/><VerificationCode id={id}/></div><div className="document-bottomline"><a href={documentOrigin}>{documentHost}</a><span>PEOPLE · PROJECTS · POSSIBILITIES</span></div><p className="program-disclaimer">{programStatement}</p></>;
+    return <><div className="program-doc-footer"><div className="program-issuer"><span className="issuer-kicker">LEARN. CREATE. PROGRESS.</span><strong>{signatory || 'SamkovAI Program Office'}</strong><span>Authorized program issuer</span>{issuedAt && <small>Date of issue · {documentDate(issuedAt)}</small>}</div><DocumentSeal/><VerificationCode id={id}/></div><div className="document-bottomline"><a href={documentOrigin}>{documentHost}</a><a href="mailto:samkovaicorporation@gmail.com">samkovaicorporation@gmail.com</a></div><p className="program-disclaimer">{programStatement}</p></>;
 }
 export function OfferDocument({ application, track }) {
     const id = offerDocumentId(application);
@@ -64,8 +64,8 @@ export function OfferDocument({ application, track }) {
 }
 export function CertificateDocument({ certificate: c }) {
     return <article className={'document program-document program-certificate' + (c.status === 'revoked' ? ' document-revoked' : '')}>
-        <DocumentArt/><DocumentHeader label="A MILESTONE EARNED"/>
-        <div className="program-doc-title"><h2>CERTIFICATE</h2><p>OF INTERNSHIP COMPLETION</p></div>
+        <div className="certificate-art" aria-hidden="true"><div className="certificate-spine"><span>LEARN / CREATE / PROGRESS</span></div><svg className="certificate-orbits" viewBox="0 0 600 600">{Array.from({length: 14}, (_, i) => <ellipse key={i} cx="300" cy="300" rx={110 + i * 12} ry={210 + i * 4} transform={'rotate(' + (i * 13) + ' 300 300)'}/>)}<circle cx="300" cy="300" r="280"/></svg><div className="certificate-frame"/><span className="certificate-edition">SAMKOVAI / PROGRAM RECORD</span></div><DocumentHeader label="A MILESTONE EARNED"/>
+        <div className="program-doc-title"><span>ORIGINAL WORK. VERIFIED ACHIEVEMENT.</span><h2>Certificate</h2><p>OF INTERNSHIP COMPLETION</p></div>
         {c.status === 'revoked' && <p className="document-status-revoked">REVOKED — this certificate is no longer valid.</p>}
         <div className="certificate-award"><p className="award-intro">This is to certify that</p><h3>{c.student_name}</h3><p>has successfully completed the</p><h4>{c.track_title}</h4><p>project-based virtual internship program at <strong>SamkovAI</strong></p><p className="certificate-dates">{documentDate(c.start_date)} <span>TO</span> {documentDate(c.end_date)}<b>·</b>{c.duration_weeks} weeks</p><p className="certificate-recognition">Demonstrated practical skills through <strong>{c.projects_completed} approved projects</strong>,<br className="certificate-wide-break"/> completing the required learning activities and program review.</p><p className="certificate-completed">Completion approved · {documentDate(c.completed_at)}</p></div>
         <DocumentFooter id={c.id} signatory={c.authorized_signatory} issuedAt={c.issued_at}/>

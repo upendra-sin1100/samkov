@@ -17,6 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, FileResponse
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator, field_validator
 from .security import level_unlocked, secure_url, project_url
+from .feedback import FeedbackInput, respectful_message
 
 load_dotenv(Path(__file__).resolve().parent / '.env')
 load_dotenv(Path(__file__).resolve().parents[1] / '.env.local')
@@ -166,6 +167,28 @@ async def platform(request:Request):
     if action in ['resource','approve_application','complete','revoke','attachment','set_user_access','save_track','review']: require_admin()
     if any(b.get(key) is None for key in required.get(action, [])):
         raise HTTPException(422, 'Please provide all required fields.')
+    if action=='send_feedback':
+        p=FeedbackInput.model_validate(b)
+        respectful_message(p.message)
+        a=await own_application(str(p.application_id))
+        if a['status'] not in ('approved','completed'):
+            raise HTTPException(409,'Join an approved program before sharing feedback.')
+        existing=await database('program_feedback',params={'application_id':'eq.'+a['id']})
+        if existing: raise HTTPException(409,'You have already sent feedback for this internship. Contact support if you need to change it.')
+        await database('program_feedback','POST',body={'application_id':a['id'],'user_id':user['id'],'rating':p.rating,'message':p.message,'status':'pending'})
+        return {'ok':True,'status':'pending'}
+    if action=='my_feedback':
+        a=await own_application(b.get('application_id'))
+        return {'feedback':await database('program_feedback',params={'application_id':'eq.'+a['id'],'user_id':'eq.'+user['id']})}
+    if action=='list_feedback':
+        require_admin()
+        return {'feedback':await database('program_feedback',params={'status':'eq.pending','limit':'100'})}
+    if action=='review_feedback':
+        require_admin()
+        if b.get('status') not in ('reviewed','dismissed'): raise HTTPException(422,'Choose a valid review status.')
+        changed=await database('program_feedback','PATCH',params={'id':'eq.'+valid_uuid(b.get('id')),'status':'eq.pending'},body={'status':b['status'],'reviewed_by':user['id']})
+        if not changed: raise HTTPException(409,'Feedback has already been reviewed. Refresh the list.')
+        return {'ok':True}
     if action=='heartbeat':
         await asyncio.to_thread(touch_user,user['id'])
         return {'ok':True}
