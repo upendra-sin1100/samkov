@@ -70,6 +70,16 @@ alter table public.profiles add column if not exists company text not null defau
 alter table public.applications add column if not exists occupation text not null default 'student' check (occupation in ('student','employee','other'));
 alter table public.applications add column if not exists company text not null default '';
 
+-- Add courses without changing existing curricula or learner records. Safe to repeat.
+insert into public.tracks(slug,title,weeks,project_count,content) values
+('frontend-development','Frontend Development',6,6,'{"category":"Development","description":"Build accessible, responsive web interfaces with JavaScript and React.","skills":["HTML & CSS","JavaScript","React"],"projects":["Responsive Landing Page","Validated Multi-step Form","React Data Dashboard","Accessibility and Performance Audit","Reusable Component Library","Frontend Capstone"]}'::jsonb),
+('backend-development','Backend Development',8,6,'{"category":"Development","description":"Design reliable APIs, model data, and build secure server applications.","skills":["Node.js","SQL","API design"],"projects":["HTTP Service","Relational Data Model","Authenticated REST API","Background Job Worker","API Reliability Lab","Backend Capstone"]}'::jsonb),
+('java-development','Java Development',8,6,'{"category":"Development","description":"Develop maintainable Java applications using object-oriented design and tested services.","skills":["Java","OOP","SQL"],"projects":["Java Fundamentals Toolkit","Object-oriented Library Manager","Persistent Inventory Application","Java REST Service","Concurrent Processing Lab","Java Capstone"]}'::jsonb),
+('mobile-development','Mobile App Development',8,6,'{"category":"Development","description":"Create practical mobile apps with adaptive layouts, navigation, and offline data.","skills":["Flutter","Dart","Mobile UX"],"projects":["Adaptive Profile App","Interactive Expense Calculator","Multi-screen Planner","API-backed Mobile App","Mobile Quality Lab","Mobile Capstone"]}'::jsonb),
+('devops-cloud','DevOps & Cloud',8,6,'{"category":"Development","description":"Automate builds, package services, and practice reliable deployment in local labs.","skills":["Docker","CI/CD","Kubernetes"],"projects":["Repeatable Environment Setup","Containerized Application","Continuous Integration Pipeline","Local Kubernetes Deployment","Monitoring and Recovery Lab","DevOps Capstone"]}'::jsonb),
+('system-design','System Design',8,6,'{"category":"Development","description":"Reason about scale, data consistency, and reliability through working prototypes.","skills":["Architecture","Caching","Distributed systems"],"projects":["Requirements and Capacity Plan","URL Shortener Prototype","Caching Experiment","Reliable Message Processing","Resilience and Load Study","System Design Capstone"]}'::jsonb)
+on conflict (slug) do nothing;
+
 CREATE TABLE IF NOT EXISTS public.program_feedback (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     application_id uuid NOT NULL UNIQUE REFERENCES public.applications(id),

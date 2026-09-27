@@ -1,0 +1,77 @@
+{
+  "checked_on": "2026-09-26",
+  "links": [
+    {
+      "url": "https://developer.mozilla.org/en-US/curriculum/",
+      "status": 200,
+      "final_url": "https://developer.mozilla.org/en-US/curriculum/",
+      "title": "MDN Curriculum"
+    },
+    {
+      "url": "https://react.dev/learn",
+      "status": 200,
+      "final_url": "https://react.dev/learn",
+      "title": "Quick Start \u2013 React"
+    },
+    {
+      "url": "https://nodejs.org/en/docs/",
+      "status": 200,
+      "final_url": "https://nodejs.org/docs/latest/api/",
+      "title": "Index | Node.js v26.10.0 Documentation"
+    },
+    {
+      "url": "https://www.postgresql.org/docs/current/tutorial.html",
+      "status": 200,
+      "final_url": "https://www.postgresql.org/docs/current/tutorial.html",
+      "title": "PostgreSQL: Documentation: 18: Part\u00a0I.\u00a0Tutorial"
+    },
+    {
+      "url": "https://docs.oracle.com/en/java/",
+      "status": 200,
+      "final_url": "https://docs.oracle.com/en/java/",
+      "title": "Java Documentation - Get Started"
+    },
+    {
+      "url": "https://dev.java/learn/",
+      "status": 200,
+      "final_url": "https://dev.java/learn/",
+      "title": "Learn Java - Dev.java"
+    },
+    {
+      "url": "https://docs.flutter.dev/",
+      "status": 200,
+      "final_url": "https://docs.flutter.dev/",
+      "title": "Flutter documentation"
+    },
+    {
+      "url": "https://developer.android.com/courses/android-basics-compose/course",
+      "status": 200,
+      "final_url": "https://developer.android.com/courses/android-basics-compose/course",
+      "title": "Android Basics with Compose course &nbsp;|&nbsp; Android Developers"
+    },
+    {
+      "url": "https://docs.docker.com/",
+      "status": 200,
+      "final_url": "https://docs.docker.com/",
+      "title": "Docker Docs"
+    },
+    {
+      "url": "https://kubernetes.io/docs/tutorials/kubernetes-basics/",
+      "status": 200,
+      "final_url": "https://kubernetes.io/docs/tutorials/kubernetes-basics/",
+      "title": "Learn Kubernetes Basics | Kubernetes"
+    },
+    {
+      "url": "https://github.com/donnemartin/system-design-primer",
+      "status": 200,
+      "final_url": "https://github.com/donnemartin/system-design-primer",
+      "title": "GitHub - donnemartin/system-design-primer: Learn how to design large-scale systems. Prep for the system design interview.  Includes Anki flashcards. \u00b7 GitHub"
+    },
+    {
+      "url": "https://www.postgresql.org/docs/current/",
+      "status": 200,
+      "final_url": "https://www.postgresql.org/docs/current/",
+      "title": "PostgreSQL: Documentation: 18: PostgreSQL 18.6 Documentation"
+    }
+  ]
+}

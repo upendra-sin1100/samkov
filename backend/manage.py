@@ -20,7 +20,8 @@ def main():
             if conn.execute("SELECT to_regclass('public.profiles')").fetchone()[0]:
                 parser.error('The destination already has profiles. Initialization is only for a new database.')
             conn.execute(Path(__file__).with_name('schema.sql').read_text(encoding='utf-8'))
-            print('Database initialized. Eight tracks are ready.')
+            count=conn.execute('SELECT count(*) FROM public.tracks').fetchone()[0]
+            print(f'Database initialized. {count} tracks are ready.')
         elif args.command=='migrate':
             for migration in sorted(Path(__file__).with_name('migrations').glob('*.sql')):
                 conn.execute(migration.read_text(encoding='utf-8'))

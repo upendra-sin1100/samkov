@@ -6,7 +6,7 @@ const assert=require('node:assert/strict');
  const db=new PGlite();
  try{
   await db.exec(fs.readFileSync('backend/schema.sql','utf8'));
-  assert.equal((await db.query('SELECT count(*)::int AS n FROM tracks')).rows[0].n,8);
+  assert.equal((await db.query('SELECT count(*)::int AS n FROM tracks')).rows[0].n,14);
   const student=(await db.query("INSERT INTO profiles(auth_subject) VALUES ('user_student') RETURNING id")).rows[0].id;
   const other=(await db.query("INSERT INTO profiles(auth_subject) VALUES ('user_other') RETURNING id")).rows[0].id;
   const app=(await db.query("INSERT INTO applications(user_id,track_slug,student_name,college,motivation,start_date,status,end_date,authorized_signatory) VALUES ($1,'python','Test Student','College','A meaningful learning motivation',current_date,'approved',current_date+42,'Program Office') RETURNING id",[student])).rows[0].id;

@@ -15,5 +15,5 @@ export default function AccountProvider({ children }) {
     const key = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
     if (!key)
         return <AccountContext.Provider value={preview}>{children}</AccountContext.Provider>;
-    return <ClerkProvider appearance={{ variables: { colorBackground: "var(--surface-alt)", colorText: "var(--ink)", colorTextSecondary: "var(--muted)", colorInputBackground: "var(--surface)", colorInputText: "var(--ink)", colorPrimary: "#526beb" } }} publishableKey={key} signInUrl="/login" signUpUrl="/signup" signInForceRedirectUrl="/dashboard" signUpForceRedirectUrl="/dashboard"><ConnectedAccount>{children}</ConnectedAccount></ClerkProvider>;
+    return <ClerkProvider appearance={{ variables: { colorBackground: "var(--surface-alt)", colorText: "var(--ink)", colorTextSecondary: "var(--muted)", colorNeutral: "var(--ink)", colorInputBackground: "var(--surface)", colorInputText: "var(--ink)", colorPrimary: "#526beb", colorTextOnPrimaryBackground: "#ffffff" } }} publishableKey={key} signInUrl="/login" signUpUrl="/signup" signInForceRedirectUrl="/dashboard" signUpForceRedirectUrl="/dashboard"><ConnectedAccount>{children}</ConnectedAccount></ClerkProvider>;
 }

@@ -120,6 +120,15 @@ html[data-theme=light] .hero-cube i{border-color:#f49a60;background:linear-gradi
 .auth-provider-panel .cl-socialButtonsBlockButtonText{color:#202124!important}
 .auth-provider-panel .cl-socialButtonsProviderIcon{opacity:1!important}
 .auth-provider-panel .cl-socialButtonsBlockButton:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+/* Clerk's code and alternative-method screens must follow the site theme too. */
+.auth-provider-panel :is(.cl-otpCodeFieldInput,.cl-formFieldInput){background:var(--surface)!important;color:var(--ink)!important;caret-color:var(--ink);border:1px solid var(--muted)!important}
+.auth-provider-panel .cl-otpCodeFieldInput{box-shadow:none!important}
+.auth-provider-panel :is(.cl-otpCodeFieldInput,.cl-formFieldInput):focus{outline:2px solid var(--blue);outline-offset:2px;border-color:var(--blue)!important}
+.auth-provider-panel .cl-alternativeMethodsBlockButton{background:var(--surface)!important;color:var(--ink)!important;border:1px solid var(--muted)!important}
+.auth-provider-panel .cl-alternativeMethodsBlockButton:hover{background:var(--accent-soft)!important}
+.auth-provider-panel :is(.cl-footerActionLink,.cl-formResendCodeLink,.cl-identityPreviewEditButton,.cl-formFieldAction,.cl-backLink){color:var(--blue)!important}
+.auth-provider-panel :is(.cl-alternativeMethodsBlockButton,.cl-footerActionLink,.cl-formResendCodeLink,.cl-identityPreviewEditButton,.cl-formFieldAction,.cl-backLink):focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.auth-provider-panel .cl-formResendCodeLink:disabled{color:var(--muted)!important;opacity:1!important}
 /* Shared internship cards: a visual introduction, then the practical details. */
 .home-track-grid{margin-top:32px}
 .internship-card{--card-accent:#b9430b;--card-tint:#fff0e6;display:flex;flex-direction:column;padding:0;overflow:hidden;border-radius:20px;background:var(--surface);box-shadow:0 3px 8px #17171703;transition:transform .25s,border-color .25s,box-shadow .25s}
@@ -167,3 +176,31 @@ html:not([data-theme=dark]) :is(.skill-tags span,.card-meta,.filter-caption,.tas
 html[data-theme=dark] .word-count.over-limit{color:#ffaaa2}.form-panel input[readonly]{color:var(--muted)}
 
 .timeline button{padding:6px;border-radius:6px}.timeline button:hover:not(:disabled){background:var(--accent-soft,#eef2ff)}.stat-grid>button{text-align:left}.stat-grid>button:hover{border-color:var(--blue)}
+
+/* Keep both account actions visible, with a dedicated row on small phones. */
+nav .mobile-account-link{display:none}
+@media(max-width:800px){
+  nav.open .mobile-account-link{display:flex}
+  .nav-actions .account-entry{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 4px;white-space:nowrap;font-size:13px;font-weight:700}
+  .nav-actions{flex-shrink:0}
+  .nav-actions .menu-button{min-width:44px;min-height:44px}
+}
+@media(max-width:600px){
+  html{scroll-padding-top:140px}
+  header{height:128px}
+  .nav-wrap{display:grid;grid-template-columns:minmax(0,1fr) 44px 44px;grid-template-rows:60px 44px;gap:8px;padding:4px 16px 12px}
+  .nav-wrap>.samkov-brand{grid-column:1;grid-row:1}
+  .nav-actions{display:contents}
+  .nav-actions .theme-toggle{grid-column:2;grid-row:1;width:44px;height:44px}
+  .nav-actions .menu-button{grid-column:3;grid-row:1}
+  .nav-actions .account-entry{grid-column:1;grid-row:2;border:1px solid var(--line);border-radius:7px}
+  .nav-actions .primary.small{display:inline-flex;grid-column:2 / 4;grid-row:2;min-height:44px;padding:8px;white-space:nowrap;font-size:12px}
+  .nav-actions .primary.small svg{display:none}
+  nav.open{top:100%;max-height:calc(100dvh - 128px)}
+}
+@media(max-width:380px){
+  header .samkov-brand{gap:7px}
+  header .samkov-wordmark{padding-left:7px}
+  header .samkov-wordmark strong{font-size:14px;letter-spacing:1px}
+  header .samkov-wordmark small{font-size:5px;letter-spacing:.6px}
+}

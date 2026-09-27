@@ -61,7 +61,7 @@ The admin dashboard lives at `/admin` and requires a server-verified administrat
 
 Use `/admin/preview` to explore the dashboard with clearly labeled sample learners. Preview changes are in memory only and never update live accounts. Project links are available for actual submissions; sample submissions do not link to invented repositories.
 
-Eight initial tracks, curated course links, three project levels, application review, offer letters, per-student progress, evidence submission, administrator feedback, free certificates after verified completion, QR verification, dark/light themes, and an automated support guide. Human support is not connected. Resource attribution is in [resource sources](docs/resource-sources.md).
+Fourteen tracks, curated course links, three project levels, application review, offer letters, per-student progress, evidence submission, administrator feedback, free certificates after verified completion, QR verification, dark/light themes, and an automated support guide. Human support is not connected. Resource attribution is in [resource sources](docs/resource-sources.md). See [additional courses](docs/additional-courses.md) for the six new tracks and their required database migration before deployment.
 
 ## Deployment
 

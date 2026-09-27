@@ -1,0 +1,94 @@
+# SamkovAI
+
+Project-based virtual internships with a React / JavaScript (Next.js) frontend and Python/FastAPI backend.
+
+**Current stack: Neon PostgreSQL + Clerk authentication + private file storage.** Supabase is no longer a runtime dependency. The original `supabase/schema.sql` remains only as a migration reference.
+
+See [setup and launch](docs/setup-and-launch.md) for exact configuration, email OTP, Google login, file storage, and migration notes.
+
+## Run locally (Windows PowerShell)
+
+Install Node.js 20.9+ and Python 3.12+. From `D:\samkovAI`:
+
+```powershell
+npm.cmd ci
+if (!(Test-Path .venv\Scripts\python.exe)) { py -m venv .venv }
+.\.venv\Scripts\python.exe -m pip install -r backend\requirements.txt
+if (!(Test-Path frontend\.env.local)) { Copy-Item frontend\.env.example frontend\.env.local }
+if (!(Test-Path backend\.env)) { Copy-Item backend\.env.example backend\.env }
+```
+
+Set the environment values, then initialize a **new, empty** Neon database:
+
+```powershell
+.\.venv\Scripts\python.exe -m backend.manage init
+.\.venv\Scripts\python.exe -m backend.manage check
+```
+
+Start the backend in one terminal:
+
+```powershell
+cd D:\samkovAI
+.\.venv\Scripts\python.exe -m uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+Start the frontend in another:
+
+```powershell
+cd D:\samkovAI
+npm.cmd run dev -- --port 3000
+```
+
+Open http://localhost:3000 after Next.js reports Ready. The first development request compiles the page. For a stable preview, stop development and use `npm.cmd run build` followed by `npm.cmd run start -- --port 3000`.
+
+Without a Clerk public key, the UI offers an explicitly labeled in-memory preview. It does not create real accounts or save progress. Live work needs both Clerk and the PostgreSQL backend configured.
+
+## Checks
+
+```powershell
+npm.cmd run check
+npm.cmd test
+npm.cmd run test:frontend
+npm.cmd run test:database
+npm.cmd run build
+```
+
+Backend tests cover authorization, JWT verification, payment verification, query parameterization, and private files. Database tests execute the real PostgreSQL schema in PGlite and exercise level gates, ownership, completion, certificate issuance and revocation. They do not connect to your cloud database.
+
+## Included flows
+
+The admin dashboard lives at `/admin` and requires a server-verified administrator account when authentication is configured. It includes a searchable learner sheet, level and course filters, pending reviews, CSV export, and a user details panel. **Approve & Promote** approves the pending evidence for the current level only when every required project has been submitted; the existing project gates then unlock the next level. The user details panel includes written review feedback, requests for changes, and final program completion. Curriculum, resources, account access, and certificate controls remain in `/admin/manage`.
+
+Use `/admin/preview` to explore the dashboard with clearly labeled sample learners. Preview changes are in memory only and never update live accounts. Project links are available for actual submissions; sample submissions do not link to invented repositories.
+
+Eight initial tracks, curated course links, three project levels, application review, offer letters, per-student progress, evidence submission, administrator feedback, free certificates after verified completion, QR verification, dark/light themes, and an automated support guide. Human support is not connected. Resource attribution is in [resource sources](docs/resource-sources.md).
+
+## Deployment
+
+Follow [Vercel + Railway deployment](docs/deploy-vercel-railway.md) for the exact host settings, environment variables, database migration, administrator setup, and upload storage configuration.
+
+Host `frontend/` as the Next.js app and `backend/` as a Python service. Set `PYTHON_API_URL` before building the frontend. Keep database credentials, file credentials, and payment secrets on the backend. Neon stores structured records; upload binaries use a private bucket or persistent backend disk, not database space. The backend pool opens at most four connections per worker.
+
+No cloud accounts or live payment credentials are provisioned by this repository. Verify real Clerk login, Neon connectivity, uploads, and free certificate issuance before enabling a live program.
+
+## JavaScript source and review integrity
+
+Frontend components use `.jsx` and shared modules use `.js`. `npm run check` checks JavaScript/JSX syntax; the production build verifies module imports and routes. TypeScript remains a development tool for these checks, not the application source language.
+
+Apply `python -m backend.manage migrate` to existing databases before deploying these changes. The repeatable migrations preserve approved evidence, prevent changes to submission ownership, and retain existing learner data. Reviews accept pending submissions only and reject stale concurrent decisions.
+
+## Profile and enrollment update
+
+Users can edit their SamkovAI display name and student/employee/other details in **My profile**. Enrollment reuses saved details, asks students for their college and employees for their company, and limits the reason for joining to 15 words. Profile changes do not rewrite existing applications or issued documents. Clerk continues to manage login and email; directory sync preserves a locally edited display name.
+
+Before deploying this version against an existing database, run `python -m backend.manage migrate` to apply `004_editable_profiles.sql` (along with any earlier migrations). Run it before starting the updated API. New databases initialized with `init` include these fields already. No hosting or authentication provider change is required.
+
+## Multiple internships and submission review
+
+The dashboard opens the only current internship or offers a chooser for multiple current applications. Completed internships remain in My profile, with certificate and workspace access. Workspace URLs include the track; submission URLs also include the project index, preserving the panel on reload. Admin personal views use only the administrator's own enrollments.
+
+Run `python -m backend.manage migrate` before deploying to apply `005_pending_submission_lock.sql`. Both the API and PostgreSQL reject replacement of pending evidence, including conflicting inserts; reviewers can request changes to permit resubmission. Approved evidence stays immutable.
+
+Offer and certificate verification share `/verify`; the offer's full SKAI-OL ID is its public internship document ID. Document dates use DD/MM/YYYY.
+
+`scripts/reset-accounts.py` is an operator-only dry run unless `--delete-all-accounts` is explicitly supplied. It permanently removes all accounts in the configured Clerk instance and associated learner records from the configured database, including admin access, while preserving curriculum and resource links. After a reset, sign up again and use the existing `make-admin` command to assign the new administrator. The script stops if submission attachments need storage cleanup.

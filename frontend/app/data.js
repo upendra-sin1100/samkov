@@ -1,3 +1,4 @@
+import { additionalCourses } from './additional-courses';
 export const tracks = [
     { slug: 'data-science', name: 'Data Science', category: 'Data & AI', icon: 'chart', color: 'blue', description: 'Turn raw data into real-world insights. Explore, analyze, and tell stories with data.', skills: ['Python', 'Pandas', 'Visualization'], weeks: 8, projects: 6 },
     { slug: 'machine-learning', name: 'Machine Learning', category: 'Data & AI', icon: 'brain', color: 'purple', description: 'Go from your first prediction to deploying models that solve meaningful problems.', skills: ['Scikit-learn', 'Python', 'ML models'], weeks: 8, projects: 8 },
@@ -6,9 +7,11 @@ export const tracks = [
     { slug: 'artificial-intelligence', name: 'Artificial Intelligence', category: 'Data & AI', icon: 'spark', color: 'pink', description: 'Explore intelligent systems through hands-on computer vision and NLP projects.', skills: ['Neural networks', 'NLP', 'TensorFlow'], weeks: 8, projects: 6 },
     { slug: 'data-analytics', name: 'Data Analytics', category: 'Data & AI', icon: 'pie', color: 'cyan', description: 'Ask better questions, discover patterns, and turn analysis into better decisions.', skills: ['SQL', 'Excel', 'Power BI'], weeks: 6, projects: 6 },
     { slug: 'generative-ai', name: 'AI / Generative AI', category: 'Data & AI', icon: 'spark', color: 'purple', description: 'Build useful AI applications with language models, retrieval, and responsible evaluation.', skills: ['LLMs', 'RAG', 'Prompting'], weeks: 8, projects: 6 },
-    { slug: 'cybersecurity', name: 'Cybersecurity', category: 'Security', icon: 'shield', color: 'blue', description: 'Learn to protect systems through safe labs, threat analysis, and security projects.', skills: ['Networking', 'Linux', 'Security'], weeks: 8, projects: 6 }
+    { slug: 'cybersecurity', name: 'Cybersecurity', category: 'Security', icon: 'shield', color: 'blue', description: 'Learn to protect systems through safe labs, threat analysis, and security projects.', skills: ['Networking', 'Linux', 'Security'], weeks: 8, projects: 6 },
+    ...additionalCourses.map(({ tasks, resources, ...track }) => track)
 ];
 export const projectNames = {
+    ...Object.fromEntries(additionalCourses.map(course => [course.slug, course.tasks.map(([title]) => title)])),
     'machine-learning': ['Python Data Analysis', 'Exploratory Data Analysis', 'Regression Project', 'Classification Project', 'Feature Engineering Project', 'End-to-End ML Project', 'Deployment Project', 'Final Capstone'],
     'data-science': ['Data Cleaning Pipeline', 'Exploratory Data Analysis', 'Statistical Analysis', 'Predictive Modeling', 'Data Storytelling Dashboard', 'Final Capstone'],
     'web-development': ['Responsive Portfolio', 'Interactive Web App', 'REST API', 'Full-Stack Application', 'Deployment Project', 'Final Capstone'],
@@ -20,6 +23,7 @@ export const projectNames = {
 };
 export function levelFor(i, n) { return i < 2 ? 'Beginner' : i < n - 2 ? 'Intermediate' : 'Advanced'; }
 export const resources = {
+    ...Object.fromEntries(additionalCourses.map(course => [course.slug, course.resources])),
     'data-science': [{ label: 'Kaggle Learn · data science courses', url: 'https://www.kaggle.com/learn' }],
     'machine-learning': [{ label: 'Google · Machine Learning Crash Course', url: 'https://developers.google.com/machine-learning/crash-course' }],
     python: [{ label: 'Harvard CS50 · Introduction to Programming with Python', url: 'https://cs50.harvard.edu/python/' }, { label: 'Python official tutorial', url: 'https://docs.python.org/3/tutorial/' }],
