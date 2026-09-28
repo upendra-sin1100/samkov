@@ -103,3 +103,21 @@
 .certificate-art:after{width:76px;height:76px;background:linear-gradient(135deg,transparent 0 48%,#ff681f 48% 61%,#142a39 61% 73%,#ff681f 73%);clip-path:polygon(0 100%,100% 0,100% 100%)}
 @media screen and (max-width:500px){.certificate-art:after{width:34px;height:34px}}
 @media print{.certificate-art:after{width:18mm;height:18mm}.program-certificate .program-disclaimer{font-size:8px!important}}
+
+/* Readable ink on both screen and paper, including the small supporting text. */
+.program-document:is(.program-offer,.program-certificate) :is(p,li,small,dt,dd,code,.award-intro,.certificate-completed,.program-disclaimer){color:#111!important;font-weight:600}
+.program-document :is(.document-motto,.document-motto>span,.program-doc-title>span,.offer-reference>span,.issuer-kicker,.program-issuer>span,.certificate-dates>span,.document-bottomline>span,.certificate-edition){color:#171717!important;font-weight:600}
+.program-document:is(.program-offer,.program-certificate) :is(strong,h3,h4){color:#090909!important;font-weight:700}
+.program-document .program-disclaimer{font-size:8px!important}
+
+@media print{
+ /* Start the named page at the root, rather than after dashboard layout boxes. */
+ html:has(.program-offer),body:has(.program-offer){page:program-offer}
+ html:has(.program-certificate),body:has(.program-certificate){page:program-certificate}
+ html:has(.program-document),body:has(.program-document),body :has(.program-document){display:block!important;width:100%!important;max-width:none!important;min-height:0!important;height:auto!important;margin:0!important;padding:0!important;border:0!important;overflow:visible!important;gap:0!important}
+ /* Remove surrounding UI from layout; visibility:hidden would still consume paper. */
+ body:has(.program-document) *:not(.program-document):not(.program-document *):not(:has(.program-document)){display:none!important}
+ .program-document{margin:0!important;break-before:auto;break-after:auto}
+ .program-offer{padding:12mm 14mm 8mm!important}
+ .program-document+.program-document{break-before:page}
+}
