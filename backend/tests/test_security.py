@@ -37,6 +37,21 @@ class SecurityTests(unittest.TestCase):
 
 class ApiTests(unittest.TestCase):
     def setUp(self): self.client=TestClient(app)
+    @patch('backend.main.request_directory_sync')
+    @patch('backend.main.database',new_callable=AsyncMock)
+    @patch('backend.main.identity',new_callable=AsyncMock)
+    def test_admin_workspace_returns_saved_accounts_during_sync_outage(self,identity,database,sync):
+        uid='11111111-1111-4111-8111-111111111111'
+        identity.return_value=({'id':uid},True)
+        database.side_effect=[[],[],[],[],{'id':uid},[{'id':uid,'role':'admin'}]]
+        sync.return_value='Account sync unavailable. Showing saved accounts; retry shortly.'
+        response=self.client.post('/api/platform',json={'action':'workspace'})
+        self.assertEqual(response.status_code,200)
+        self.assertTrue(response.json()['isAdmin'])
+        self.assertEqual(response.json()['users'][0]['id'],uid)
+        self.assertIn('Showing saved accounts',response.json()['account_sync_error'])
+        sync.assert_called_once()
+
     @patch('backend.main.database',new_callable=AsyncMock)
     @patch('backend.main.identity',new_callable=AsyncMock)
     def test_workspace_keeps_student_records_private(self,identity,database):

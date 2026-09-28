@@ -26,7 +26,7 @@ export default function Platform() {
     const tracks = [...seedTracks.filter(t => !catalog.some(c => c.slug === t.slug)), ...catalog.map(c => ({ slug: c.slug, name: c.title, category: c.content.category || seedTracks.find(t => t.slug === c.slug)?.category || 'Development', description: c.content.description || seedTracks.find(t => t.slug === c.slug)?.description || '', skills: c.content.skills || seedTracks.find(t => t.slug === c.slug)?.skills || [], weeks: c.weeks, projects: c.project_count, icon: seedTracks.find(t => t.slug === c.slug)?.icon || 'code', color: seedTracks.find(t => t.slug === c.slug)?.color || 'blue' }))];
     const projectNames = { ...seedNames, ...Object.fromEntries(catalog.filter(c => c.content.projects).map(c => [c.slug, c.content.projects])) };
     async function refreshCatalog() { try {
-        const r = await fetch('/api/catalog');
+        const r = await fetch('/api/catalog', { signal: AbortSignal.timeout(20000) });
         if (r.ok) {
             const data = await r.json();
             setCatalog(data.tracks || []);
@@ -39,11 +39,21 @@ export default function Platform() {
     useEffect(() => { setPath(location.pathname); const pop = () => { setPath(location.pathname); setMenu(false); }; window.addEventListener('popstate', pop); return () => window.removeEventListener('popstate', pop); }, []);
     useEffect(() => { if (!account.configured || !account.loaded)
         return; setWorkspaceState('loading'); setUser(account.user); setRecords({ applications: [], submissions: [], certificates: [], payments: [] }); setSelectedApplicationId(''); }, [account.user, account.loaded, account.configured]);
-    async function api(action, data = {}) { const token = await account.getToken(); const r = await fetch('/api/platform', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token || ''}` }, body: JSON.stringify({ action, ...data }) }); const v = await r.json().catch(() => ({ error: 'The service is unavailable. Please try again shortly.' })); if (!r.ok)
-        throw Error(v.error || 'Something went wrong. Please try again.'); return v; }
+    async function api(action, data = {}) {
+        try {
+            const token = await account.getToken();
+            const r = await fetch('/api/platform', { method: 'POST', signal: AbortSignal.timeout(20000), headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token || ''}` }, body: JSON.stringify({ action, ...data }) });
+            const v = await r.json().catch(() => ({ error: 'The service is unavailable. Please try again shortly.' }));
+            if (!r.ok) throw Error(v.error || 'Something went wrong. Please try again.');
+            return v;
+        } catch (error) {
+            if (error.name === 'TimeoutError') throw Error('The server took too long to respond. Please try again.');
+            throw error;
+        }
+    }
     const currentUserId = useRef(null);
     currentUserId.current = configured ? (account.user?.id ?? null) : (user?.id ?? null);
-    async function refresh() { const requestedUser = user?.id; await refreshCatalog(); if (user && configured) {
+    async function refresh() { const requestedUser = user?.id; void refreshCatalog(); if (user && configured) {
         try {
             const workspace = await api('workspace');
             if (currentUserId.current === requestedUser) {

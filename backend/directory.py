@@ -7,6 +7,34 @@ from .db import connection
 
 _lock = threading.Lock()
 _last_sync = 0
+_refresh_lock = threading.Lock()
+_refresh_thread = None
+_last_attempt = None
+_refresh_error = None
+
+
+def request_directory_sync():
+    """Refresh display fields in one worker without delaying workspace reads."""
+    global _refresh_thread, _last_attempt
+    with _refresh_lock:
+        if (_refresh_thread is None or not _refresh_thread.is_alive()) and (
+                _last_attempt is None or time.monotonic() - _last_attempt >= 60):
+            _last_attempt = time.monotonic()
+            _refresh_thread = threading.Thread(target=_refresh_directory, daemon=True)
+            _refresh_thread.start()
+        return _refresh_error
+
+
+def _refresh_directory():
+    global _refresh_error
+    try:
+        sync_directory()
+        error = None
+    except Exception:
+        # Keep account data and credentials out of error messages.
+        error = 'Account sync unavailable. Showing saved accounts; retry shortly.'
+    with _refresh_lock:
+        _refresh_error = error
 
 def display_fields(user):
     subject = user.get('id', '')

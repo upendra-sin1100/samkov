@@ -28,7 +28,7 @@ app.add_middleware(CORSMiddleware, allow_origins=[SITE_URL], allow_methods=['GET
 
 from .db import database, record_visit, touch_user, analytics_snapshot
 from .auth import identity
-from .directory import sync_directory
+from .directory import request_directory_sync
 from . import files
 
 @app.middleware('http')
@@ -198,11 +198,9 @@ async def platform(request:Request):
     if action=='workspace':
         data={}
         if admin:
-            try:
-                await asyncio.to_thread(sync_directory)
-            except Exception:
-                # Keep local accounts usable during upstream outages. No secrets in logs or responses.
-                data['account_sync_error']='Account sync unavailable. Showing saved accounts; retry shortly.'
+            sync_error = request_directory_sync()
+            if sync_error:
+                data['account_sync_error'] = sync_error
         for table in ['applications','submissions','certificates']:
             data[table]=await database(table,params={} if admin else {'user_id':'eq.'+user['id']})
         data['resources']=await database('resources')

@@ -1,8 +1,35 @@
 import unittest
+import threading
 from unittest.mock import patch, MagicMock
 from backend.directory import display_fields, save_users
+from backend import directory
 
 class DirectoryTests(unittest.TestCase):
+    def test_background_sync_does_not_block_or_duplicate_and_retries_later(self):
+        started, release = threading.Event(), threading.Event()
+        def slow_sync():
+            started.set()
+            release.wait(2)
+            raise RuntimeError('private upstream error')
+        with patch.object(directory, '_refresh_thread', None), patch.object(directory, '_last_attempt', None), patch.object(directory, '_refresh_error', None), patch.object(directory, 'sync_directory', side_effect=slow_sync) as sync:
+            try:
+                self.assertIsNone(directory.request_directory_sync())
+                self.assertTrue(started.wait(1))
+                self.assertIsNone(directory.request_directory_sync())
+                self.assertEqual(sync.call_count, 1)
+            finally:
+                release.set()
+                directory._refresh_thread.join(2)
+            self.assertIn('Showing saved accounts', directory.request_directory_sync())
+            self.assertNotIn('private upstream error', directory._refresh_error)
+            self.assertEqual(sync.call_count, 1)
+            directory._last_attempt -= 61
+            sync.side_effect = None
+            directory.request_directory_sync()
+            directory._refresh_thread.join(2)
+            self.assertIsNone(directory._refresh_error)
+            self.assertEqual(sync.call_count, 2)
+
     def test_display_fields_use_verified_primary_email(self):
         user={'id':'user_new','username':'newlearner','first_name':'New','last_name':'Learner',
               'primary_email_address_id':'primary','email_addresses':[

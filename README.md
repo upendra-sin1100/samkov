@@ -75,6 +75,10 @@ No cloud accounts or live payment credentials are provisioned by this repository
 
 Frontend components use `.jsx` and shared modules use `.js`. `npm run check` checks JavaScript/JSX syntax; the production build verifies module imports and routes. TypeScript remains a development tool for these checks, not the application source language.
 
+The frontend serves `/sitemap.xml` for the public pages and internship tracks, and `/robots.txt` links to it. Set `NEXT_PUBLIC_SITE_URL` to the canonical public origin before the production build. Account and admin pages are excluded from the sitemap.
+
+Admin workspace requests read saved accounts immediately while Clerk directory updates run in a single background worker per API process. Failed syncs retry after one minute; the dashboard's next refresh picks up updated names. Catalog loading runs independently of workspace loading, and API requests time out with a retry message after 20 seconds. Deploy both services for these fixes, and run the existing backend migrations so the admin feedback inbox has its required table.
+
 Apply `python -m backend.manage migrate` to existing databases before deploying these changes. The repeatable migrations preserve approved evidence, prevent changes to submission ownership, and retain existing learner data. Reviews accept pending submissions only and reject stale concurrent decisions.
 
 ## Profile and enrollment update
