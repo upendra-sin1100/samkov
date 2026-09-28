@@ -199,6 +199,7 @@ nav .mobile-account-link{display:none}
   nav.open{top:100%;max-height:calc(100dvh - 128px)}
 }
 /* Status pills keep dark, legible ink on their pale background in either theme. */
+.application-review{margin:16px 0;min-width:0}.application-review h3{font-size:17px;margin:0 0 12px}.application-review .application-motivation{white-space:pre-wrap;overflow-wrap:anywhere;padding:16px;border-left:3px solid #d46629;background:var(--surface-alt,#f5f6fa);color:var(--ink,#142a39);font-size:14px;line-height:1.7;font-weight:500;margin:0 0 18px}.application-review dl{display:grid;gap:13px;margin:0}.application-review dl>div{display:block}.application-review dt{font-size:11px;color:var(--muted,#65718a);margin-bottom:4px}.application-review dd{margin:0;font-size:14px;line-height:1.5;overflow-wrap:anywhere;color:var(--ink,#142a39)}.ad-shell .application-review .application-motivation{color:#172c45;background:#f5f7fb}.ad-shell .application-review h3,.ad-shell .application-review dd{color:var(--ad-text,#e9ebee)}.ad-shell .application-review dt{color:var(--ad-muted,#aab8ca)}
 .workspace-main .status,html[data-theme=dark] .workspace-main .status{background:#edf1ff;color:#25356a;font-weight:700;border:1px solid #cdd6f3}
 @media(max-width:380px){
   header .samkov-brand{gap:7px}
