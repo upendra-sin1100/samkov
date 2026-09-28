@@ -12,7 +12,7 @@ require.extensions['.jsx'] = (module, filename) => module._compile(ts.transpileM
 process.env.NEXT_PUBLIC_SITE_URL = 'https://samkovai.me';
 const {OfferDocument, CertificateDocument} = require('../frontend/app/program-documents.jsx');
 const application = {student_name:'Taylor Morgan',verification_id:'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',start_date:'2026-09-28',end_date:'2026-11-09'};
-const certificate = {...application,id:'SKAI-2026-'+'A'.repeat(32),track_title:'Frontend Development',duration_weeks:6,completed_at:'2026-11-09',issued_at:'2026-11-10',projects_completed:6,status:'active'};
+const certificate = {...application,student_name:'Taylor Morgan Alexander Christopher Benjamin Sullivan Montgomery Richardson',id:'SKAI-2026-'+'A'.repeat(32),track_title:'Artificial Intelligence and Machine Learning Development',duration_weeks:6,completed_at:'2026-11-09',issued_at:'2026-11-10',projects_completed:6,status:'active'};
 const out = fs.mkdtempSync(path.join(os.tmpdir(), 'samkov-print-'));
 const css = ['globals.css','program-documents.css','program-feedback.css'].map(file => fs.readFileSync(path.join('frontend/app',file),'utf8')).join('\n');
 (async () => {
@@ -41,6 +41,7 @@ const css = ['globals.css','program-documents.css','program-feedback.css'].map(f
                     assert.equal(result.pages,1,`${name}/${theme}/${width}: expected one page, got ${result.pages}; PDFs: ${out}`);
                     assert.match(result.texts[0],/Taylor Morgan/);
                     assert.match(result.texts[0],/samkovaicorporation@gmail.com/);
+                    assert.match(result.texts[0],/does not certify employment/);
                     assert.doesNotMatch(result.texts[0],/Private feedback form|Choose internship|Website footer|Workspace title/);
                     assert.equal(result.width > result.height,name === 'certificate');
                 }

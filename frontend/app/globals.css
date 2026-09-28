@@ -198,6 +198,8 @@ nav .mobile-account-link{display:none}
   .nav-actions .primary.small svg{display:none}
   nav.open{top:100%;max-height:calc(100dvh - 128px)}
 }
+/* Status pills keep dark, legible ink on their pale background in either theme. */
+.workspace-main .status,html[data-theme=dark] .workspace-main .status{background:#edf1ff;color:#25356a;font-weight:700;border:1px solid #cdd6f3}
 @media(max-width:380px){
   header .samkov-brand{gap:7px}
   header .samkov-wordmark{padding-left:7px}

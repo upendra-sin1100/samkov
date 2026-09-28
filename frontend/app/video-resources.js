@@ -1,7 +1,14 @@
 const source = (slug) => 'https://www.nexlevr.app/resources/' + slug;
 const v = (title, url, language, slug) => ({ title, url, language, kind: url.includes('playlist') ? 'Playlist' : 'Video', source: source(slug) });
+const courseVideo = (title, id) => ({title, url: `https://www.youtube.com/watch?v=${id}`, language: 'English', kind: 'Video', creator: 'freeCodeCamp.org', source: `https://www.youtube.com/watch?v=${id}`});
 // Links observed on Nexlevr's public resource pages on 2026-09-17. Content remains with its creators.
 export const videos = {
+    'frontend-development': [courseVideo('Frontend Web Development Bootcamp — HTML, CSS & JavaScript', 'zJSY8tbf_ys')],
+    'backend-development': [courseVideo('Node.js and Express.js — Full Course', 'Oe421EPjeBE'), courseVideo('Node.js / Express — Build 4 Projects', 'qwfE7fSVaZM')],
+    'java-development': [courseVideo('Java Programming for Beginners — Full Course', 'A74TOX803D0')],
+    'mobile-development': [courseVideo('Flutter for Beginners — Cross Platform App Development', 'VPvVD8t02U8')],
+    'devops-cloud': [courseVideo('Learn Docker — Deploying Containerized Apps', 'rjjES5IsPdg')],
+    'system-design': [courseVideo('System Design for Beginners', 'm8Icp_Cid5o'), courseVideo('System Design Concepts and Interview Prep', 'F2FmTdLtb_4')],
     python: [v('Python Complete Course', 'https://youtube.com/playlist?list=PLsyeobzWxl7omDoEYrrf3oXvXxa6MPgek', 'English', 'python-development'), v('Python Full Tutorial', 'https://youtu.be/nLRL_NcnK-4', 'English', 'python-development'), v('Python Full Course', 'https://youtu.be/UrsmFxEIp5k', 'Hindi', 'python-development'), v('Python Tutorial', 'https://youtu.be/HAxm8n9QY50', 'Tamil', 'python-development'), v('Python Complete Guide', 'https://youtu.be/QGAuolgCTHE', 'Tamil', 'python-development')],
     'machine-learning': [v('Stanford ML Course', 'https://youtube.com/playlist?list=PLoROMvodv4rMiGQp3WXShtMGgzqpfVfbU', 'English', 'machine-learning'), v('ML Full Course', 'https://youtu.be/JxgmHe2NyeY', 'English', 'machine-learning'), v('Machine Learning Course', 'https://youtube.com/playlist?list=PLaldQ9PzZd9qT0KsKJ7yCq70iFFP3MFJ5', 'Hindi', 'machine-learning'), v('ML with Python', 'https://youtube.com/playlist?list=PLKnIA16_Rmvbr7zKYQuBfsVkjoLcJgxHH', 'Hindi', 'machine-learning')],
     'data-science': [v('Data Science Tutorial', 'https://youtu.be/LZzq1zSL1bs', 'English', 'data-science'), v('Data Science Full Course', 'https://youtu.be/k6HOBjkUkE4', 'Tamil', 'data-science')],

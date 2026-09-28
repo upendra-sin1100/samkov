@@ -121,3 +121,19 @@
  .program-offer{padding:12mm 14mm 8mm!important}
  .program-document+.program-document{break-before:page}
 }
+
+/* Leave room for printer margins and longer participant/track names. */
+@page program-certificate{size:A4 landscape;margin:6mm}
+@media print{
+ .program-certificate{min-height:0!important;padding:6mm 12mm 7mm 17mm!important}
+ .program-certificate .program-doc-header{min-height:15mm;margin-bottom:1mm}
+ .program-certificate .program-doc-title{margin:2mm 0 3mm}
+ .program-certificate .program-doc-title h2{font-size:46px}
+ .program-certificate .certificate-award{max-width:none}
+ .program-certificate .certificate-award h3{font-size:28px;margin:2mm auto;padding-bottom:2mm;max-width:220mm}
+ .program-certificate .certificate-award h4{font-size:18px}
+ .program-certificate .certificate-award p{margin:1.5mm 0}
+ .program-certificate .program-doc-footer{margin-top:3mm;padding-top:3mm}
+ .program-certificate .document-seal{width:21mm;height:21mm}
+ .program-certificate .document-bottomline{margin-top:2mm}
+}
