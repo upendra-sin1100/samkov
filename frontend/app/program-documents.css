@@ -218,9 +218,10 @@
 /* PDF capture for the offer letter (A4 portrait at 96dpi) */
 .pdf-capture{box-sizing:border-box!important;overflow:hidden!important;margin:0!important;max-width:none!important;box-shadow:none!important;display:flex!important;flex-direction:column}
 
-/* Compact offer layout for PDF capture: A4 portrait at 96dpi, footer pinned to bottom */
-.pdf-capture.program-offer{width:794px!important;height:auto!important;min-height:1123px!important;padding:26px 40px 18px!important}
+/* Compact offer layout: footer pinned to the bottom, with room above the frame */
+.pdf-capture.program-offer{width:794px!important;height:auto!important;min-height:1123px!important;padding:26px 40px 36px!important}
 .pdf-capture.program-offer>p{margin:0 0 8px!important;font-size:11px!important;line-height:1.45!important}
+.pdf-capture.program-offer .document-border{inset:8px!important}
 .pdf-capture.program-offer .program-doc-header{min-height:64px!important;margin-bottom:6px!important}
 .pdf-capture.program-offer .samkov-symbol{height:56px!important;width:32px!important}
 .pdf-capture.program-offer .samkov-wordmark strong{font-size:24px!important}
@@ -239,5 +240,5 @@
 .pdf-capture.program-offer .program-doc-footer{margin-top:auto!important;padding-top:12px!important}
 .pdf-capture.program-offer .document-seal{width:84px!important;height:84px!important}
 .pdf-capture.program-offer .document-verification img{width:72px!important;height:72px!important}
-.pdf-capture.program-offer .document-bottomline{margin-top:12px!important;padding-top:8px!important}
-.pdf-capture.program-offer .program-disclaimer{margin:6px 0 0!important}
+.pdf-capture.program-offer .document-bottomline{margin-top:12px!important;padding-top:8px!important;padding-right:60px!important}
+.pdf-capture.program-offer .program-disclaimer{margin:8px 0 0!important;max-width:78%!important;line-height:1.4!important}
