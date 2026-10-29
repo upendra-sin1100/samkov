@@ -66,9 +66,14 @@ password):
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USERNAME=samkovaicorporation@gmail.com
-EMAIL_PASSWORD=YOUR_GMAIL_APP_PASSWORD
+EMAIL_PASSWORD=YOUR_16_CHARACTER_GOOGLE_APP_PASSWORD
 EMAIL_FROM=samkovaicorporation@gmail.com
 ```
+
+`EMAIL_PASSWORD` must be a Google App Password generated after 2-Step
+Verification is enabled. Do not use the normal Gmail account password.
+The learner must also verify their primary email address in Clerk; unverified
+or missing learner addresses are not used for notifications.
 
 The backend sends the email after an administrator approves an application.
 Approval remains saved if delivery is unavailable, and the admin dashboard

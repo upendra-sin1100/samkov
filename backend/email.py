@@ -19,10 +19,14 @@ def send_offer_email(*, recipient: str, student_name: str, track_name: str,
     password = os.getenv('EMAIL_PASSWORD', '')
     sender = os.getenv('EMAIL_FROM', username).strip()
     if not recipient:
-        raise EmailConfigurationError('The learner does not have a verified email address.')
+        raise EmailConfigurationError(
+            'The learner does not have a verified primary email in Clerk. '
+            'Ask the learner to verify their email, then sync the account directory.'
+        )
     if not username or not password or not sender:
         raise EmailConfigurationError(
-            'Email is not configured. Set EMAIL_USERNAME, EMAIL_PASSWORD, and EMAIL_FROM.'
+            'Email is not configured. Set EMAIL_USERNAME, EMAIL_PASSWORD to a Google App Password, '
+            'and EMAIL_FROM.'
         )
 
     message = EmailMessage()
@@ -59,10 +63,14 @@ def send_internship_email(*, recipient: str, student_name: str, track_name: str,
     password = os.getenv('EMAIL_PASSWORD', '')
     sender = os.getenv('EMAIL_FROM', username).strip()
     if not recipient:
-        raise EmailConfigurationError('The learner does not have a verified email address.')
+        raise EmailConfigurationError(
+            'The learner does not have a verified primary email in Clerk. '
+            'Ask the learner to verify their email, then sync the account directory.'
+        )
     if not username or not password or not sender:
         raise EmailConfigurationError(
-            'Email is not configured. Set EMAIL_USERNAME, EMAIL_PASSWORD, and EMAIL_FROM.'
+            'Email is not configured. Set EMAIL_USERNAME, EMAIL_PASSWORD to a Google App Password, '
+            'and EMAIL_FROM.'
         )
 
     message = EmailMessage()
@@ -90,3 +98,46 @@ SamkovAI Program Office
     except (OSError, smtplib.SMTPException) as exc:
         raise EmailDeliveryError('The internship reminder email could not be delivered.') from exc
 
+
+def send_certificate_email(*, recipient: str, student_name: str, track_name: str,
+                           certificate_id: str, certificate_url: str) -> None:
+    """Notify a learner when their verified completion certificate is issued."""
+    host = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+    username = os.getenv('EMAIL_USERNAME', '').strip()
+    password = os.getenv('EMAIL_PASSWORD', '')
+    sender = os.getenv('EMAIL_FROM', username).strip()
+    if not recipient:
+        raise EmailConfigurationError(
+            'The learner does not have a verified primary email in Clerk. '
+            'Ask the learner to verify their email, then sync the account directory.'
+        )
+    if not username or not password or not sender:
+        raise EmailConfigurationError(
+            'Email is not configured. Set EMAIL_USERNAME, EMAIL_PASSWORD to a Google App Password, '
+            'and EMAIL_FROM.'
+        )
+
+    message = EmailMessage()
+    message['Subject'] = 'Your SamkovAI certificate is ready'
+    message['From'] = sender
+    message['To'] = recipient
+    message.set_content(
+        f"""Hello {student_name},
+
+Congratulations! Your verified certificate for the {track_name} program is now available.
+
+View your certificate:
+{certificate_url}
+
+Certificate ID: {certificate_id}
+
+SamkovAI Program Office
+"""
+    )
+    try:
+        with smtplib.SMTP(host, int(os.getenv('EMAIL_PORT', '587')), timeout=20) as smtp:
+            smtp.starttls()
+            smtp.login(username, password)
+            smtp.send_message(message)
+    except (OSError, smtplib.SMTPException) as exc:
+        raise EmailDeliveryError('The certificate email could not be delivered.') from exc

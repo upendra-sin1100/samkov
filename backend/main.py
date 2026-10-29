@@ -30,7 +30,7 @@ from .db import database, record_visit, touch_user, analytics_snapshot
 from .auth import identity
 from .directory import request_directory_sync, sync_directory
 from . import files
-from .email import EmailConfigurationError, EmailDeliveryError, send_offer_email, send_internship_email
+from .email import EmailConfigurationError, EmailDeliveryError, send_certificate_email, send_offer_email, send_internship_email
 
 @app.middleware('http')
 async def private_response_headers(request, call_next):
@@ -352,8 +352,32 @@ async def platform(request:Request):
     elif action=='claim_certificate':
         a=await own_application(b['application_id'])
         if a['status']!='completed': raise HTTPException(409,'Verified completion is required before issuing a free certificate.')
+        existing=await database('certificates',params={'application_id':'eq.'+a['id'],'select':'id'},one=True)
         certificate=await database('rpc/issue_certificate','POST',body={'app_id':a['id']},one=True)
-        return {'certificate':certificate}
+        email_status={'sent':False,'skipped':bool(existing)}
+        if not existing:
+            profiles=await database('profiles',params={'id':'eq.'+a['user_id'],'select':'email'})
+            if not profiles or not (profiles[0].get('email') or '').strip():
+                try:
+                    await asyncio.to_thread(sync_directory, True)
+                    profiles=await database('profiles',params={'id':'eq.'+a['user_id'],'select':'email'})
+                except (HTTPException, OSError, ValueError, httpx.HTTPError) as exc:
+                    logging.warning('Could not refresh learner email before certificate notification for %s: %s',a['id'],exc)
+            profile=profiles[0] if profiles else {}
+            try:
+                await asyncio.to_thread(
+                    send_certificate_email,
+                    recipient=(profile.get('email') or '').strip(),
+                    student_name=certificate.get('student_name') or a['student_name'],
+                    track_name=certificate.get('track_title') or 'internship',
+                    certificate_id=certificate['id'],
+                    certificate_url=SITE_URL+'/verify/'+certificate['id'],
+                )
+                email_status={'sent':True}
+            except (EmailConfigurationError, EmailDeliveryError) as exc:
+                logging.warning('Certificate issued but notification email was not sent for %s: %s',a['id'],exc)
+                email_status={'sent':False,'error':str(exc)}
+        return {'certificate':certificate,'email':email_status}
     else: raise HTTPException(400,'Unknown operation.')
     return {'ok':True}
 

@@ -145,12 +145,14 @@ class ApiTests(unittest.TestCase):
     def test_claim_returns_a_single_certificate(self,identity,database):
         uid='11111111-1111-4111-8111-111111111111'
         identity.return_value=({'id':uid},False)
-        certificate={'id':'SKAI-2026-'+'A'*32,'application_id':uid}
-        database.side_effect=[{'id':uid,'user_id':uid,'status':'completed'},certificate]
+        certificate={'id':'SKAI-2026-'+'A'*32,'application_id':uid,'student_name':'Learner','track_title':'Python'}
+        database.side_effect=[{'id':uid,'user_id':uid,'status':'completed'},None,certificate,[],[]]
         response=self.client.post('/api/platform',json={'action':'claim_certificate','application_id':uid})
         self.assertEqual(response.status_code,200)
         self.assertEqual(response.json()['certificate'],certificate)
-        self.assertTrue(database.call_args.kwargs['one'])
+        self.assertFalse(response.json()['email']['sent'])
+        self.assertIn('verified primary email',response.json()['email']['error'])
+        self.assertTrue(database.call_args_list[2].kwargs['one'])
     @patch.dict('os.environ',{'DATABASE_URL':'postgresql://test' })
     @patch('backend.main.database',new_callable=AsyncMock)
     def test_public_catalog_includes_only_active_track_resources(self,database):
