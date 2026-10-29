@@ -113,9 +113,9 @@ export function PrintDocumentButton() {
             // draw the bottom-right corner straight onto the image (offer letter only)
             if (!certificate) {
                 const ctx = canvas.getContext('2d');
-                const k = canvas.width / clone.offsetWidth;   // canvas pixels per CSS pixel
+                const k = canvas.width / pageWpx;   // canvas pixels per CSS pixel
                 const size = 90 * k;
-                const x0 = canvas.width - size, y0 = canvas.height - size;
+                const x0 = canvas.width - size, y0 = pageHpx * k - size;
                 const P = (x, y) => [x0 + (x / 100) * size, y0 + (y / 100) * size];
                 const poly = (pts, color) => {
                     ctx.beginPath();
