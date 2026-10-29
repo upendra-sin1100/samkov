@@ -30,6 +30,7 @@ from .db import database, record_visit, touch_user, analytics_snapshot
 from .auth import identity
 from .directory import request_directory_sync
 from . import files
+from .email import EmailConfigurationError, EmailDeliveryError, send_offer_email
 
 @app.middleware('http')
 async def private_response_headers(request, call_next):
@@ -237,7 +238,27 @@ async def platform(request:Request):
         a=await database('applications',params={'id':'eq.'+valid_uuid(b['id']),'status':'eq.pending'},one=True)
         t=await database('tracks',params={'slug':'eq.'+a['track_slug']},one=True)
         end=date.fromisoformat(a['start_date'])+timedelta(weeks=t['weeks'])
-        await database('applications','PATCH',params={'id':'eq.'+a['id'],'status':'eq.pending'},body={'status':'approved','end_date':str(end),'authorized_signatory':os.getenv('AUTHORIZED_SIGNATORY','SamkovAI Program Office')})
+        signatory=os.getenv('AUTHORIZED_SIGNATORY','SamkovAI Program Office')
+        await database('applications','PATCH',params={'id':'eq.'+a['id'],'status':'eq.pending'},body={'status':'approved','end_date':str(end),'authorized_signatory':signatory})
+        email_status={'sent':False}
+        profiles=await database('profiles',params={'id':'eq.'+a['user_id'],'select':'email'})
+        profile=profiles[0] if profiles else {}
+        offer_id='SKAI-OL-'+str(a['verification_id']).replace('-','').upper()
+        offer_url=SITE_URL+'/offer/'+a['track_slug']
+        try:
+            await asyncio.to_thread(
+                send_offer_email,
+                recipient=(profile.get('email') or '').strip(),
+                student_name=a['student_name'],
+                track_name=t['title'],
+                offer_id=offer_id,
+                offer_url=offer_url,
+            )
+            email_status={'sent':True}
+        except (EmailConfigurationError, EmailDeliveryError) as exc:
+            logging.warning('Offer approved but notification email was not sent for %s: %s',a['id'],exc)
+            email_status={'sent':False,'error':str(exc)}
+        return {'ok':True,'email':email_status}
     elif action=='review':
         require_admin()
         p=ReviewInput.model_validate(b)

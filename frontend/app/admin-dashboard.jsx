@@ -103,14 +103,20 @@ export default function AdminDashboard({ records, tracks, names, preview, api, r
             if (preview)
                 setSamples(old => ({ ...old, applications: old.applications.map(a => a.id === row.id && a.status === 'pending' ? { ...a, status: 'approved' } : a), submissions: old.submissions.map(s => ids.includes(s.id) ? { ...s, status, feedback: feedbackFor(s.id) || (status === 'rejected' ? 'Changes requested by the program administrator.' : 'Project evidence reviewed and approved by the program administrator.') } : s) }));
             else {
+                let approval;
                 if (row.status === 'Application pending')
-                    await api('approve_application', { id: row.id });
+                    approval = await api('approve_application', { id: row.id });
                 else
                     for (const id of ids)
                         await api('review', { id, status, feedback: feedbackFor(id) || 'Project evidence reviewed and approved by the program administrator.' });
                 await refresh();
+                if (row.status === 'Application pending' && approval?.email?.sent === false)
+                    setNotice(`${row.student_name}’s application was approved, but the offer email was not sent: ${approval.email.error || 'recipient email is unavailable.'}`);
+                else
+                    setNotice(status === 'rejected' ? `Changes requested for ${row.student_name}.` : row.status === 'Application pending' ? `${row.student_name}’s application approved and offer email sent.` : single ? `Project approved for ${row.student_name}.` : row.current === 'Advanced' ? `${row.student_name}’s final level approved.` : `${row.student_name} promoted to ${levels[levels.indexOf(row.current) + 1]}.`);
             }
-            setNotice(status === 'rejected' ? `Changes requested for ${row.student_name}.` : row.status === 'Application pending' ? `${row.student_name}’s application approved.` : single ? `Project approved for ${row.student_name}.` : row.current === 'Advanced' ? `${row.student_name}’s final level approved.` : `${row.student_name} promoted to ${levels[levels.indexOf(row.current) + 1]}.`);
+            if (preview)
+                setNotice(status === 'rejected' ? `Changes requested for ${row.student_name}.` : `${row.student_name}’s application approved in preview.`);
         }
         catch (e) {
             setNotice(e.message + ' Refresh the page to confirm the latest review status.');

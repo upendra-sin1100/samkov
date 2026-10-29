@@ -58,6 +58,22 @@ FILE_STORAGE=disabled
 
 Replace placeholders; they are not working credentials. Remove obsolete Supabase values from your local environment once switching. Existing filled environment files are not overwritten by the repository changes. Restart both servers after changes; frontend variables are embedded when building.
 
+To email an approved learner their offer-letter link, configure Gmail SMTP in
+`backend/.env` using a Google **app password** (do not use the normal account
+password):
+
+```dotenv
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USERNAME=samkovaicorporation@gmail.com
+EMAIL_PASSWORD=YOUR_GMAIL_APP_PASSWORD
+EMAIL_FROM=samkovaicorporation@gmail.com
+```
+
+The backend sends the email after an administrator approves an application.
+Approval remains saved if delivery is unavailable, and the admin dashboard
+shows the delivery error for operator follow-up.
+
 If you use another port, change both site URLs, `CLERK_AUTHORIZED_PARTIES`, and your permitted Clerk origins. `localhost` and `127.0.0.1` are different browser origins. Use the configured URL consistently.
 
 ## 4. Optional project uploads

@@ -12,6 +12,7 @@ require.extensions['.jsx'] = (module, filename) => module._compile(ts.transpileM
 process.env.NEXT_PUBLIC_SITE_URL = 'https://samkovai.me';
 const {OfferDocument, CertificateDocument} = require('../frontend/app/program-documents.jsx');
 const application = {student_name:'Taylor Morgan',verification_id:'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',start_date:'2026-09-28',end_date:'2026-11-09'};
+const offerTrack = {name:'Artificial Intelligence and Machine Learning Development',weeks:6};
 const certificate = {...application,student_name:'Taylor Morgan Alexander Christopher Benjamin Sullivan Montgomery Richardson',id:'SKAI-2026-'+'A'.repeat(32),track_title:'Artificial Intelligence and Machine Learning Development',duration_weeks:6,completed_at:'2026-11-09',issued_at:'2026-11-10',projects_completed:6,status:'active'};
 const out = fs.mkdtempSync(path.join(os.tmpdir(), 'samkov-print-'));
 const css = ['globals.css','program-documents.css','program-feedback.css'].map(file => fs.readFileSync(path.join('frontend/app',file),'utf8')).join('\n');
@@ -20,7 +21,7 @@ const css = ['globals.css','program-documents.css','program-feedback.css'].map(f
     try {
         const page = await browser.newPage();
         await page.route('**/api/qr*', route => route.fulfill({contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="112" height="112"><rect width="112" height="112" fill="white"/><path d="M10 10h30v30H10zM70 10h30v30H70zM10 70h30v30H10z"/></svg>'}));
-        for (const [name, element] of [['offer',React.createElement(OfferDocument,{application,track:{name:'Frontend Development',weeks:6}})],['certificate',React.createElement(CertificateDocument,{certificate})]]) {
+        for (const [name, element] of [['offer',React.createElement(OfferDocument,{application,track:offerTrack})],['certificate',React.createElement(CertificateDocument,{certificate})]]) {
             for (const theme of ['light','dark']) {
                 // An empty host/notification box must not force the full-page document onto page two.
                 const html = '<!doctype html><html data-theme="'+theme+'"><head><base href="https://samkovai.me"><style>'+css+'</style></head><body><div style="height:12px" aria-live="polite"></div><header>Site navigation</header><div class="workspace container"><aside class="workspace-nav">Navigation</aside><main class="workspace-main"><div class="page-title"><h1>Workspace title</h1></div><label>Choose internship<select><option>Frontend Development</option></select></label>'+renderToStaticMarkup(element)+'<button>Print / Save PDF</button><section class="program-feedback"><h2>Private feedback form</h2><textarea>Do not print this</textarea></section></main></div><footer>Website footer</footer></body></html>';
