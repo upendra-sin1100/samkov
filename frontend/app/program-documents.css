@@ -1,6 +1,6 @@
 /* Shared branded stationery. All geometry is vector/CSS, keeping printed text crisp. */
 .program-document{--doc-accent:#ed5b13;--doc-ink:#131920;--doc-line:#e6e2de;position:relative;isolation:isolate;overflow:hidden;box-sizing:border-box;background:#fff!important;color:var(--doc-ink)!important;text-align:left;padding:44px 48px 28px!important;border:0!important;border-radius:0;max-width:1050px;margin:0 auto;overflow-wrap:anywhere;box-shadow:0 16px 48px #19233012;font-family:Arial,Helvetica,sans-serif}
-.program-document>*:not(.document-art){position:relative;z-index:1}.document-art{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}.document-art:after{content:'';position:absolute;inset:10px;border:1.5px solid #dcdad6;border-radius:2px;z-index:1}
+.program-document>*:not(.document-art){position:relative;z-index:1}.document-art{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}.document-border{position:absolute;inset:10px;border:1.5px solid #dcdad6;border-radius:2px;z-index:1}
 .document-corner{position:absolute;width:200px;height:200px;background:linear-gradient(135deg,#ff782a 0%,#f25d13 35%,#161c23 35%,#161c23 56%,transparent 56%);clip-path:polygon(0 0,100% 0,0 100%);z-index:2}.corner-top{left:0;top:0}.corner-bottom{right:0;bottom:0;transform:rotate(180deg)}
 .document-corner:after{content:'';position:absolute;left:0;top:0;width:100%;height:100%;background:linear-gradient(135deg,transparent 64%,#ed5b13 64%,#ed5b13 65%,transparent 65%)}
 .document-watermark{position:absolute;width:230px;height:417px;right:-18px;top:30%;color:#17202b;opacity:.035}.program-document p,.program-document li,.program-document small{color:#41454c!important;line-height:1.65}
@@ -23,7 +23,7 @@
  body:has(.program-document){margin:0!important;padding:0!important;background:white!important}
  .program-offer{page:program-offer;min-height:297mm}.program-certificate{page:program-certificate;min-height:210mm}
  .program-document{width:100%!important;max-width:none!important;padding:14mm 16mm 9mm!important;box-shadow:none!important;break-inside:avoid;print-color-adjust:exact;-webkit-print-color-adjust:exact}
- .document-art:after{inset:5mm}.document-corner{width:28mm;height:28mm}.program-doc-header{padding-left:10mm;margin-bottom:7mm;min-height:20mm}.program-document .samkov-symbol{height:20mm!important;width:11mm!important}.program-document .samkov-wordmark strong{font-size:25px!important}.document-motto{display:block;font-size:8px}
+ .document-border{inset:5mm}.document-corner{width:28mm;height:28mm}.program-doc-header{padding-left:10mm;margin-bottom:7mm;min-height:20mm}.program-document .samkov-symbol{height:20mm!important;width:11mm!important}.program-document .samkov-wordmark strong{font-size:25px!important}.document-motto{display:block;font-size:8px}
  .program-doc-title{margin:6mm 0}.program-doc-title h2{font-size:40px}.program-doc-title:after{margin-top:4mm}.offer-reference{margin:5mm 0;padding:3mm 0}.program-document>p,.program-document li{font-size:11px;line-height:1.6}.program-document>h3{font-size:11px;margin:5mm 0 2mm}.program-document ul{margin:2mm 0 4mm}.program-document li{margin-bottom:1mm}.program-document .offer-facts{grid-template-columns:repeat(3,minmax(0,1fr));margin:5mm 0;padding:5mm 4mm;gap:5mm 4mm}.program-document dd{font-size:10px}.program-document .offer-closing{margin-top:5mm}
  .program-doc-footer,.program-certificate .program-doc-footer{grid-template-columns:minmax(0,1fr) 25mm minmax(0,1.3fr);gap:6mm;margin-top:6mm;padding-top:5mm}.document-seal,.program-certificate .document-seal{width:25mm;height:25mm}.document-verification{grid-column:auto;padding:0;border:0}.document-verification img{width:21mm;height:21mm}.document-bottomline{margin-top:5mm;padding-top:3mm}.program-document .program-disclaimer{font-size:7px!important}
  .program-certificate{padding:10mm 18mm 8mm!important}.program-certificate .program-doc-header{margin-bottom:4mm}.program-certificate .program-doc-title{margin:4mm 0 5mm}.program-certificate .program-doc-title h2{font-size:48px;letter-spacing:6px}.program-certificate .program-doc-title p{font-size:13px;letter-spacing:4px}.certificate-award h3{font-size:38px;margin:3mm auto 4mm;padding-bottom:3mm}.certificate-award p{font-size:12px;margin:2mm 0}.certificate-award h4{font-size:20px}.certificate-award .certificate-dates{margin:3mm 0}.certificate-award .certificate-recognition{font-size:11px}.certificate-award .certificate-completed{margin-top:2mm}.program-certificate .program-doc-footer{margin-top:4mm;padding-top:0}.program-certificate .document-bottomline{margin-top:4mm}
@@ -159,7 +159,7 @@
  .program-offer .document-verification img{width:17mm;height:17mm}
  .program-offer .document-bottomline{margin-top:2mm;padding-top:1.5mm}
  .program-offer .program-disclaimer{font-size:6px!important;line-height:1.3}
- .program-offer .document-art:after{inset:4mm}
+ .program-offer .document-border{inset:4mm}
 }
 
 /* Match the print geometry while html2pdf captures the document for download. */
@@ -187,7 +187,7 @@
 .document-download-mode .document-verification img{width:17mm;height:17mm}
 .document-download-mode .document-bottomline{margin-top:2mm;padding-top:1.5mm}
 .document-download-mode .program-disclaimer{font-size:6px!important;line-height:1.3}
-.document-download-mode.program-offer .document-art:after{inset:4mm}
+.document-download-mode.program-offer .document-border{inset:4mm}
 .document-download-mode.program-certificate{width:297mm!important;height:210mm!important;max-width:none!important;padding:5mm 10mm 5mm 15mm!important;overflow:hidden!important}
 .document-download-mode.program-certificate .program-doc-title h2{font-size:42px}
 .document-download-mode.program-certificate .program-doc-title p{font-size:9.5px;letter-spacing:3.5px}
