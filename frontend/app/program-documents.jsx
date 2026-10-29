@@ -96,16 +96,17 @@ export function PrintDocumentButton() {
             const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import('html2canvas'), import('jspdf')]);
             const certificate = source.classList.contains('program-certificate');
             const pageW = certificate ? 297 : 210, pageH = certificate ? 210 : 297;
+            const pageWpx = certificate ? 1123 : 794, pageHpx = certificate ? 794 : 1123;
             const clone = source.cloneNode(true);
-            clone.classList.add('document-download-mode');
+            clone.classList.add(certificate ? 'document-download-mode' : 'pdf-capture');
             clone.style.margin = '0';
             stage = window.document.createElement('div');
-            stage.style.cssText = `position:fixed;left:0;top:0;width:${pageW}mm;height:${pageH}mm;overflow:hidden;z-index:-1;pointer-events:none;background:#fff`;
+            stage.style.cssText = `position:fixed;left:0;top:0;width:${pageWpx}px;height:${pageHpx}px;overflow:hidden;z-index:-1;pointer-events:none;background:#fff`;
             stage.appendChild(clone);
             window.document.body.appendChild(stage);
             const canvas = await html2canvas(clone, {
                 scale: 2, useCORS: true, backgroundColor: '#ffffff',
-                windowWidth: 1280, scrollX: 0, scrollY: 0,
+                windowWidth: 1280, windowHeight: pageHpx, scrollX: 0, scrollY: 0,
             });
             const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: certificate ? 'landscape' : 'portrait' });
             pdf.addImage(canvas.toDataURL('image/jpeg', 0.98), 'JPEG', 0, 0, pageW, pageH);
