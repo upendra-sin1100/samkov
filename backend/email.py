@@ -1,8 +1,12 @@
 """Transactional email delivery for program notifications."""
 import logging
+import json
 import os
 import smtplib
 from email.message import EmailMessage
+from email.utils import parseaddr
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +19,42 @@ class EmailDeliveryError(RuntimeError):
     """Raised when the configured mail server rejects delivery."""
 
 
+def _send_via_brevo(message: EmailMessage, *, error_message: str) -> None:
+    api_key = os.getenv('BREVO_API_KEY', '').strip()
+    _, sender_email = parseaddr(message['From'])
+    _, recipient_email = parseaddr(message['To'])
+    payload = {
+        'sender': {'name': 'SamkovAI Program Office', 'email': sender_email},
+        'to': [{'email': recipient_email}],
+        'subject': message['Subject'],
+        'textContent': message.get_content(),
+    }
+    request = Request(
+        'https://api.brevo.com/v3/smtp/email',
+        data=json.dumps(payload).encode('utf-8'),
+        headers={
+            'api-key': api_key,
+            'content-type': 'application/json',
+            'accept': 'application/json',
+        },
+        method='POST',
+    )
+    try:
+        with urlopen(request, timeout=15):
+            return
+    except HTTPError as exc:
+        response_body = exc.read().decode('utf-8', errors='replace')
+        logger.error('Brevo API returned HTTP %s: %s', exc.code, response_body)
+        raise EmailDeliveryError(error_message) from exc
+    except (URLError, OSError) as exc:
+        logger.exception('Brevo API request failed')
+        raise EmailDeliveryError(error_message) from exc
+
+
 def _send_message(message: EmailMessage, *, error_message: str) -> None:
+    if os.getenv('BREVO_API_KEY', '').strip():
+        return _send_via_brevo(message, error_message=error_message)
+
     host = os.getenv('EMAIL_HOST', 'smtp.gmail.com').strip()
     username = os.getenv('EMAIL_USERNAME', '').strip()
     password = os.getenv('EMAIL_PASSWORD', '').replace(' ', '')
