@@ -57,3 +57,11 @@
 .ad-shell .ad-mobile-sort{display:none}
 @media(max-width:1000px){.ad-shell .ad-mobile-sort{display:inline-flex}.ad-toolbar>.ad-mobile-sort{margin-left:0}}
 @media(max-width:760px){.ad-review-banner>button{flex:1 0 100%;justify-content:space-between;border-top:1px solid #506c94;padding-top:12px;margin-top:2px}.ad-review-banner>div:nth-child(2){min-width:0}}
+
+/* Email controls — manual send buttons in the user drawer */
+.ad-email-controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:4px}
+.ad-email-controls>.ad-button{gap:8px}
+.ad-email-notice{flex-basis:100%;margin:4px 0 0;font-size:12px;line-height:1.5;color:#a5ddc2}
+.ad-email-notice:first-letter{color:#7ecfac}
+.ad-drawer-section .ad-section-label svg{vertical-align:middle;margin-bottom:1px}
+

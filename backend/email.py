@@ -49,3 +49,44 @@ SamkovAI Program Office
             smtp.send_message(message)
     except (OSError, smtplib.SMTPException) as exc:
         raise EmailDeliveryError('The offer email could not be delivered.') from exc
+
+
+def send_internship_email(*, recipient: str, student_name: str, track_name: str,
+                          workspace_url: str) -> None:
+    """Send an internship reminder / welcome-back email to an active intern."""
+    host = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+    username = os.getenv('EMAIL_USERNAME', '').strip()
+    password = os.getenv('EMAIL_PASSWORD', '')
+    sender = os.getenv('EMAIL_FROM', username).strip()
+    if not recipient:
+        raise EmailConfigurationError('The learner does not have a verified email address.')
+    if not username or not password or not sender:
+        raise EmailConfigurationError(
+            'Email is not configured. Set EMAIL_USERNAME, EMAIL_PASSWORD, and EMAIL_FROM.'
+        )
+
+    message = EmailMessage()
+    message['Subject'] = f'Your SamkovAI internship — {track_name}'
+    message['From'] = sender
+    message['To'] = recipient
+    message.set_content(
+        f"""Hello {student_name},
+
+This is a reminder about your active SamkovAI internship in the {track_name} program.
+
+Open your workspace to continue where you left off, submit your projects and take the next step in your learning journey.
+
+Your workspace:
+{workspace_url}
+
+SamkovAI Program Office
+"""
+    )
+    try:
+        with smtplib.SMTP(host, int(os.getenv('EMAIL_PORT', '587')), timeout=20) as smtp:
+            smtp.starttls()
+            smtp.login(username, password)
+            smtp.send_message(message)
+    except (OSError, smtplib.SMTPException) as exc:
+        raise EmailDeliveryError('The internship reminder email could not be delivered.') from exc
+

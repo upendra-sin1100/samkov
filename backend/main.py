@@ -30,7 +30,7 @@ from .db import database, record_visit, touch_user, analytics_snapshot
 from .auth import identity
 from .directory import request_directory_sync, sync_directory
 from . import files
-from .email import EmailConfigurationError, EmailDeliveryError, send_offer_email
+from .email import EmailConfigurationError, EmailDeliveryError, send_offer_email, send_internship_email
 
 @app.middleware('http')
 async def private_response_headers(request, call_next):
@@ -156,7 +156,7 @@ async def platform(request:Request):
     if not isinstance(b, dict): raise HTTPException(422, 'Request body must be a JSON object.')
     action=b.get('action')
     if not isinstance(action, str): raise HTTPException(422, 'Provide a valid action.')
-    required = {'resource':['track_slug','title','url'], 'approve_application':['id'], 'complete':['id'], 'revoke':['id'], 'attachment':['path'], 'set_user_access':['id','disabled'], 'claim_certificate':['application_id']}
+    required = {'resource':['track_slug','title','url'], 'approve_application':['id'], 'complete':['id'], 'revoke':['id'], 'attachment':['path'], 'set_user_access':['id','disabled'], 'claim_certificate':['application_id'], 'send_email':['id','email_type']}
     def require_admin():
         if not admin: raise HTTPException(403,'Administrator access required.')
     async def own_application(value):
@@ -165,7 +165,7 @@ async def platform(request:Request):
         if a['user_id']!=user['id']: raise HTTPException(403,'Application access denied.')
         return a
     # Keep authorization ahead of field validation for administrator operations.
-    if action in ['resource','approve_application','complete','revoke','attachment','set_user_access','save_track','review']: require_admin()
+    if action in ['resource','approve_application','complete','revoke','attachment','set_user_access','save_track','review','send_email']: require_admin()
     if any(b.get(key) is None for key in required.get(action, [])):
         raise HTTPException(422, 'Please provide all required fields.')
     if action=='send_feedback':
@@ -265,6 +265,50 @@ async def platform(request:Request):
             logging.warning('Offer approved but notification email was not sent for %s: %s',a['id'],exc)
             email_status={'sent':False,'error':str(exc)}
         return {'ok':True,'email':email_status}
+    elif action=='send_email':
+        require_admin()
+        email_type = b.get('email_type')
+        if email_type not in ('offer', 'internship'):
+            raise HTTPException(422, "Choose a valid email type: 'offer' or 'internship'.")
+        a = await database('applications', params={'id':'eq.'+valid_uuid(b['id'])}, one=True)
+        if email_type == 'offer' and a['status'] not in ('approved', 'completed'):
+            raise HTTPException(409, 'The application must be approved before sending an offer email.')
+        if email_type == 'internship' and a['status'] != 'approved':
+            raise HTTPException(409, 'An active approved internship is required to send a reminder email.')
+        t = await database('tracks', params={'slug':'eq.'+a['track_slug']}, one=True)
+        profiles = await database('profiles', params={'id':'eq.'+a['user_id'], 'select':'email'})
+        if not profiles or not (profiles[0].get('email') or '').strip():
+            try:
+                await asyncio.to_thread(sync_directory, True)
+                profiles = await database('profiles', params={'id':'eq.'+a['user_id'], 'select':'email'})
+            except (HTTPException, OSError, ValueError, httpx.HTTPError) as exc:
+                logging.warning('Could not refresh learner email before manual send for %s: %s', a['id'], exc)
+        profile = profiles[0] if profiles else {}
+        recipient = (profile.get('email') or '').strip()
+        try:
+            if email_type == 'offer':
+                offer_id = 'SKAI-OL-' + str(a['verification_id']).replace('-','').upper()
+                offer_url = SITE_URL + '/offer/' + a['track_slug']
+                await asyncio.to_thread(
+                    send_offer_email,
+                    recipient=recipient,
+                    student_name=a['student_name'],
+                    track_name=t['title'],
+                    offer_id=offer_id,
+                    offer_url=offer_url,
+                )
+            else:
+                workspace_url = SITE_URL + '/dashboard'
+                await asyncio.to_thread(
+                    send_internship_email,
+                    recipient=recipient,
+                    student_name=a['student_name'],
+                    track_name=t['title'],
+                    workspace_url=workspace_url,
+                )
+        except (EmailConfigurationError, EmailDeliveryError) as exc:
+            raise HTTPException(503, str(exc)) from exc
+        return {'ok': True, 'sent_to': recipient}
     elif action=='review':
         require_admin()
         p=ReviewInput.model_validate(b)
