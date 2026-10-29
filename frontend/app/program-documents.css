@@ -164,6 +164,8 @@
 
 /* Match the print geometry while html2pdf captures the document for download. */
 .document-download-mode{box-sizing:border-box!important;overflow:hidden!important}
+.document-download-mode .document-corner{width:32mm;height:32mm;clip-path:none}
+.document-download-mode .document-corner:after{clip-path:none}
 .document-download-mode.program-offer{width:210mm!important;height:297mm!important;max-width:none!important;padding:6mm 11mm 4mm!important}
 .document-download-mode.program-certificate{width:297mm!important;height:210mm!important;max-width:none!important;padding:6mm 12mm 7mm 17mm!important}
 .document-download-mode .program-doc-header{min-height:14mm;margin-bottom:2mm}
