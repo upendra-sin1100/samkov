@@ -1,6 +1,7 @@
 'use client';
 import { createContext, useContext, useMemo } from 'react';
 import { ClerkProvider, useAuth, useClerk, useUser } from '@clerk/nextjs';
+import SyncEmail from './sync-email';
 const preview = { configured: false, loaded: true, user: null, getToken: async () => null, signOut: async () => { } };
 const AccountContext = createContext(preview);
 export const useAccount = () => useContext(AccountContext);
@@ -9,7 +10,7 @@ function ConnectedAccount({ children }) {
     const { getToken } = useAuth();
     const { signOut } = useClerk();
     const student = useMemo(() => user ? { id: user.id, email: user.primaryEmailAddress?.emailAddress, user_metadata: { full_name: user.fullName || user.firstName || '' } } : null, [user]);
-    return <AccountContext.Provider value={{ configured: true, loaded: isLoaded, user: student, getToken: () => getToken(), signOut: async () => { await signOut(); } }}>{children}</AccountContext.Provider>;
+    return <AccountContext.Provider value={{ configured: true, loaded: isLoaded, user: student, getToken: () => getToken(), signOut: async () => { await signOut(); } }}><SyncEmail />{children}</AccountContext.Provider>;
 }
 export default function AccountProvider({ children }) {
     const key = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;

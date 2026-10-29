@@ -19,7 +19,7 @@ TABLES = {
  'program_feedback': 'id application_id user_id rating message status created_at reviewed_by',
  'profiles': 'id auth_subject email display_name username role disabled display_name_custom occupation college company',
  'tracks': 'slug title weeks project_count content active',
- 'applications': 'id user_id track_slug student_name college occupation company motivation start_date end_date status verification_id authorized_signatory completed_at created_at',
+ 'applications': 'id user_id track_slug student_name email college occupation company motivation start_date end_date status verification_id authorized_signatory completed_at created_at',
  'submissions': 'id application_id user_id project_index github_url live_url linkedin_url notes attachment status feedback reviewed_by updated_at',
  'resources': 'id track_slug project_index title url created_by',
  'payments': 'id application_id user_id amount currency status payment_id created_at',

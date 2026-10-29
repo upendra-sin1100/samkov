@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, FileResponse
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, ValidationError, model_validator, field_validator
 from .security import level_unlocked, secure_url, project_url
 from .feedback import FeedbackInput, respectful_message
 
@@ -80,6 +80,11 @@ class ProfileInput(BaseModel):
         if self.occupation!='employee': self.company=''
         return self
 
+class ProfileEmailInput(BaseModel):
+    clerk_user_id: str = Field(pattern=r'^user_[A-Za-z0-9_]+$')
+    email: EmailStr
+    name: str | None = Field(default=None, max_length=100)
+
 class ApplicationInput(ProfileInput):
     email: str = Field(min_length=5, max_length=320)
     track_slug:str=Field(min_length=2,max_length=80,pattern=r'^[a-z0-9-]+$')
@@ -128,6 +133,15 @@ def valid_uuid(value):
 
 @app.get('/api/health')
 async def health(): return {'status':'ok','backend':'Python / FastAPI','configured':bool(os.getenv('DATABASE_URL') and os.getenv('CLERK_ISSUER_URL'))}
+
+@app.post('/api/profile/email')
+async def update_profile_email(payload: ProfileEmailInput, request: Request):
+    user, _ = await identity(request)
+    if payload.clerk_user_id != user['auth_subject']:
+        raise HTTPException(403, 'Profile identity does not match the signed-in account.')
+    await database('profiles', 'PATCH', params={'id':'eq.' + user['id']},
+                   body={'email':str(payload.email)})
+    return {'ok':True}
 
 @app.get('/api/verify')
 async def verify(id:str):
@@ -302,6 +316,9 @@ async def platform(request:Request):
                 )
         except (EmailConfigurationError, EmailDeliveryError) as exc:
             raise HTTPException(503, str(exc)) from exc
+        if recipient:
+            await database('profiles', 'PATCH', params={'id':'eq.' + a['user_id']},
+                           body={'email':recipient})
         return {'ok': True, 'sent_to': recipient}
     elif action=='review':
         require_admin()

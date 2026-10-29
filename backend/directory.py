@@ -65,7 +65,7 @@ def sync_directory(force=False):
             return
         secret = os.getenv('CLERK_SECRET_KEY')
         if not secret:
-            raise ValueError('Account directory sync needs CLERK_SECRET_KEY on the backend.')
+            return 0
         users, offset = [], 0
         with httpx.Client(base_url='https://api.clerk.com/v1',
                           headers={'Authorization': 'Bearer ' + secret}, timeout=15) as client:
