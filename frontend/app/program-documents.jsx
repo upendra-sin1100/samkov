@@ -86,8 +86,7 @@ export function PrintDocumentButton() {
     const [busy, setBusy] = useState(false), [error, setError] = useState('');
     async function download() {
         const source = window.document.querySelector('.program-document');
-        if (!source || busy)
-            return;
+        if (!source || busy) return;
         setBusy(true);
         setError('');
         let stage;
@@ -104,21 +103,40 @@ export function PrintDocumentButton() {
             stage.style.cssText = `position:fixed;left:0;top:0;width:${pageWpx}px;${certificate ? `height:${pageHpx}px;overflow:hidden;` : ''}z-index:-1;pointer-events:none;background:#fff`;
             stage.appendChild(clone);
             window.document.body.appendChild(stage);
+            await new Promise(r => requestAnimationFrame(() => r()));
+
             const canvas = await html2canvas(clone, {
                 scale: 2, useCORS: true, backgroundColor: '#ffffff',
                 windowWidth: 1280, windowHeight: Math.max(pageHpx, clone.scrollHeight), scrollX: 0, scrollY: 0,
             });
+
+            // draw the bottom-right corner straight onto the image (offer letter only)
+            if (!certificate) {
+                const ctx = canvas.getContext('2d');
+                const k = canvas.width / clone.offsetWidth;   // canvas pixels per CSS pixel
+                const size = 90 * k;
+                const x0 = canvas.width - size, y0 = canvas.height - size;
+                const P = (x, y) => [x0 + (x / 100) * size, y0 + (y / 100) * size];
+                const poly = (pts, color) => {
+                    ctx.beginPath();
+                    pts.map(p => P(p[0], p[1])).forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+                    ctx.closePath();
+                    ctx.fillStyle = color;
+                    ctx.fill();
+                };
+                poly([[100, 100], [30, 100], [100, 30]], '#f25d13');
+                poly([[30, 100], [0, 100], [100, 0], [100, 30]], '#161c23');
+            }
+
             const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: certificate ? 'landscape' : 'portrait' });
             let w = pageW, h = (canvas.height / canvas.width) * pageW;
             if (h > pageH) { w = (pageH / h) * pageW; h = pageH; }
             pdf.addImage(canvas.toDataURL('image/jpeg', 0.98), 'JPEG', (pageW - w) / 2, 0, w, h);
             pdf.save(certificate ? 'samkovai-certificate.pdf' : 'samkovai-offer-letter.pdf');
-        }
-        catch (downloadError) {
+        } catch (downloadError) {
             console.error('Document PDF download failed.', downloadError);
             setError('PDF download failed. Please try again.');
-        }
-        finally {
+        } finally {
             stage?.remove();
             setBusy(false);
         }
