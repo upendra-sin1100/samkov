@@ -110,12 +110,22 @@ export function PrintDocumentButton() {
                 windowWidth: 1280, windowHeight: Math.max(pageHpx, clone.scrollHeight), scrollX: 0, scrollY: 0,
             });
 
-            // draw the bottom-right corner straight onto the image (offer letter only)
+            let pdfCanvas = canvas;
             if (!certificate) {
-                const ctx = canvas.getContext('2d');
-                const k = canvas.width / pageWpx;   // canvas pixels per CSS pixel
+                const k = canvas.width / pageWpx;
+                const pageHeight = Math.min(canvas.height, Math.round(pageHpx * k));
+                pdfCanvas = window.document.createElement('canvas');
+                pdfCanvas.width = canvas.width;
+                pdfCanvas.height = pageHeight;
+                const pageContext = pdfCanvas.getContext('2d');
+                pageContext.fillStyle = '#ffffff';
+                pageContext.fillRect(0, 0, pdfCanvas.width, pdfCanvas.height);
+                pageContext.drawImage(canvas, 0, 0);
+
+                // Draw the artwork on the final page image so it cannot be lost during PDF scaling.
+                const ctx = pdfCanvas.getContext('2d');
                 const size = 90 * k;
-                const x0 = Math.max(0, canvas.width - size), y0 = Math.max(0, canvas.height - size);
+                const x0 = pdfCanvas.width - size, y0 = pdfCanvas.height - size;
                 const P = (x, y) => [x0 + (x / 100) * size, y0 + (y / 100) * size];
                 const poly = (pts, color) => {
                     ctx.beginPath();
@@ -129,9 +139,9 @@ export function PrintDocumentButton() {
             }
 
             const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: certificate ? 'landscape' : 'portrait' });
-            let w = pageW, h = (canvas.height / canvas.width) * pageW;
+            let w = pageW, h = (pdfCanvas.height / pdfCanvas.width) * pageW;
             if (h > pageH) { w = (pageH / h) * pageW; h = pageH; }
-            pdf.addImage(canvas.toDataURL('image/jpeg', 0.98), 'JPEG', (pageW - w) / 2, 0, w, h);
+            pdf.addImage(pdfCanvas.toDataURL('image/jpeg', 0.98), 'JPEG', (pageW - w) / 2, 0, w, h);
             pdf.save(certificate ? 'samkovai-certificate.pdf' : 'samkovai-offer-letter.pdf');
         } catch (downloadError) {
             console.error('Document PDF download failed.', downloadError);
