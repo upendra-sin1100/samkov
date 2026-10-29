@@ -141,7 +141,7 @@
 /* Keep the complete offer, including its verification footer, inside one portrait page. */
 @page program-offer{size:A4 portrait;margin:0}
 @media print{
- .program-offer{page:program-offer;min-height:0!important;padding:7mm 12mm 5mm!important}
+ .program-offer{page:program-offer;width:210mm!important;height:297mm!important;min-height:297mm!important;max-height:297mm!important;padding:7mm 12mm 5mm!important}
  .program-offer .program-doc-header{min-height:16mm;margin-bottom:2mm}
  .program-offer .program-doc-title{margin:2mm 0 3mm}
  .program-offer .program-doc-title h2{font-size:36px}
