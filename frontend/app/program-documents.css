@@ -208,8 +208,6 @@
 .document-download-mode .corner-top{width:28mm;height:28mm}
 .document-download-mode .corner-bottom{width:22mm;height:22mm}
 .pdf-capture{box-sizing:border-box!important;overflow:hidden!important;margin:0!important;max-width:none!important;box-shadow:none!important;display:flex!important;flex-direction:column}
-.pdf-capture.program-offer{width:794px!important;height:1123px!important}
-.pdf-capture .program-doc-footer{margin-top:auto!important}
 
 /* Corners are SVG now: remove old clip-path/gradient/rotate */
 .document-corner{background:none!important;clip-path:none!important;transform:none!important}
@@ -219,5 +217,27 @@
 
 /* PDF capture for the offer letter (A4 portrait at 96dpi) */
 .pdf-capture{box-sizing:border-box!important;overflow:hidden!important;margin:0!important;max-width:none!important;box-shadow:none!important;display:flex!important;flex-direction:column}
-.pdf-capture.program-offer{width:794px!important;height:1123px!important}
-.pdf-capture .program-doc-footer{margin-top:auto!important}
+
+/* Compact offer layout for PDF capture: A4 portrait at 96dpi, footer pinned to bottom */
+.pdf-capture.program-offer{width:794px!important;height:auto!important;min-height:1123px!important;padding:26px 40px 18px!important}
+.pdf-capture.program-offer>p{margin:0 0 8px!important;font-size:11px!important;line-height:1.45!important}
+.pdf-capture.program-offer .program-doc-header{min-height:64px!important;margin-bottom:6px!important}
+.pdf-capture.program-offer .samkov-symbol{height:56px!important;width:32px!important}
+.pdf-capture.program-offer .samkov-wordmark strong{font-size:24px!important}
+.pdf-capture.program-offer .program-doc-title{margin:10px 0!important}
+.pdf-capture.program-offer .program-doc-title h2{font-size:40px!important;margin:6px 0 4px!important}
+.pdf-capture.program-offer .program-doc-title:after{margin-top:10px!important}
+.pdf-capture.program-offer .offer-reference{margin:12px 0!important;padding:7px 0!important}
+.pdf-capture.program-offer>h3{font-size:11px!important;margin:12px 0 5px!important}
+.pdf-capture.program-offer ul{margin:4px 0 8px!important}
+.pdf-capture.program-offer li{font-size:11px!important;line-height:1.45!important;margin-bottom:0!important}
+.pdf-capture.program-offer .offer-facts{margin:12px 0!important;padding:12px 14px!important;gap:12px 14px!important}
+.pdf-capture.program-offer .offer-facts svg{width:18px!important;height:18px!important}
+.pdf-capture.program-offer dt{font-size:8px!important}
+.pdf-capture.program-offer dd{font-size:10px!important;margin:2px 0 0!important;line-height:1.35!important}
+.pdf-capture.program-offer .offer-closing{margin-top:10px!important}
+.pdf-capture.program-offer .program-doc-footer{margin-top:auto!important;padding-top:12px!important}
+.pdf-capture.program-offer .document-seal{width:84px!important;height:84px!important}
+.pdf-capture.program-offer .document-verification img{width:72px!important;height:72px!important}
+.pdf-capture.program-offer .document-bottomline{margin-top:12px!important;padding-top:8px!important}
+.pdf-capture.program-offer .program-disclaimer{margin:6px 0 0!important}

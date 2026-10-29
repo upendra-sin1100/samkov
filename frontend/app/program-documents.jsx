@@ -101,15 +101,17 @@ export function PrintDocumentButton() {
             clone.classList.add(certificate ? 'document-download-mode' : 'pdf-capture');
             clone.style.margin = '0';
             stage = window.document.createElement('div');
-            stage.style.cssText = `position:fixed;left:0;top:0;width:${pageWpx}px;height:${pageHpx}px;overflow:hidden;z-index:-1;pointer-events:none;background:#fff`;
+            stage.style.cssText = `position:fixed;left:0;top:0;width:${pageWpx}px;${certificate ? `height:${pageHpx}px;overflow:hidden;` : ''}z-index:-1;pointer-events:none;background:#fff`;
             stage.appendChild(clone);
             window.document.body.appendChild(stage);
             const canvas = await html2canvas(clone, {
                 scale: 2, useCORS: true, backgroundColor: '#ffffff',
-                windowWidth: 1280, windowHeight: pageHpx, scrollX: 0, scrollY: 0,
+                windowWidth: 1280, windowHeight: Math.max(pageHpx, clone.scrollHeight), scrollX: 0, scrollY: 0,
             });
             const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: certificate ? 'landscape' : 'portrait' });
-            pdf.addImage(canvas.toDataURL('image/jpeg', 0.98), 'JPEG', 0, 0, pageW, pageH);
+            let w = pageW, h = (canvas.height / canvas.width) * pageW;
+            if (h > pageH) { w = (pageH / h) * pageW; h = pageH; }
+            pdf.addImage(canvas.toDataURL('image/jpeg', 0.98), 'JPEG', (pageW - w) / 2, 0, w, h);
             pdf.save(certificate ? 'samkovai-certificate.pdf' : 'samkovai-offer-letter.pdf');
         }
         catch (downloadError) {
