@@ -81,6 +81,7 @@ class ProfileInput(BaseModel):
         return self
 
 class ApplicationInput(ProfileInput):
+    email: str = Field(min_length=5, max_length=320)
     track_slug:str=Field(min_length=2,max_length=80,pattern=r'^[a-z0-9-]+$')
     motivation:str=Field(min_length=1,max_length=1500)
     start_date:date
@@ -90,6 +91,13 @@ class ApplicationInput(ProfileInput):
     def word_limit(cls, value):
         if len(value.split())>15:
             raise ValueError('Use 15 words or fewer for your reason for joining.')
+        return value
+
+    @field_validator('email')
+    @classmethod
+    def valid_email(cls, value):
+        if not re.fullmatch(r'[^@\s]+@[^@\s]+\.[^@\s]+', value):
+            raise ValueError('Enter a valid email address.')
         return value
 class SubmissionInput(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
@@ -217,7 +225,7 @@ async def platform(request:Request):
         p=ApplicationInput.model_validate(b)
         if p.start_date<date.today(): raise HTTPException(422,'Choose a valid future start date.')
         await database('tracks',params={'slug':'eq.'+p.track_slug,'active':'eq.true'},one=True)
-        await database('applications','POST',body={'user_id':user['id'],'track_slug':p.track_slug,'student_name':p.name,'occupation':p.occupation,'college':p.college,'company':p.company,'motivation':p.motivation,'start_date':str(p.start_date)})
+        await database('applications','POST',body={'user_id':user['id'],'track_slug':p.track_slug,'student_name':p.name,'email':p.email,'occupation':p.occupation,'college':p.college,'company':p.company,'motivation':p.motivation,'start_date':str(p.start_date)})
     elif action=='submit':
         p=SubmissionInput.model_validate(b)
         project_url(p.github_url)
@@ -241,20 +249,12 @@ async def platform(request:Request):
         signatory=os.getenv('AUTHORIZED_SIGNATORY','SamkovAI Program Office')
         await database('applications','PATCH',params={'id':'eq.'+a['id'],'status':'eq.pending'},body={'status':'approved','end_date':str(end),'authorized_signatory':signatory})
         email_status={'sent':False}
-        profiles=await database('profiles',params={'id':'eq.'+a['user_id'],'select':'email'})
-        if not profiles or not (profiles[0].get('email') or '').strip():
-            try:
-                await asyncio.to_thread(sync_directory, True)
-                profiles=await database('profiles',params={'id':'eq.'+a['user_id'],'select':'email'})
-            except (HTTPException, OSError, ValueError, httpx.HTTPError) as exc:
-                logging.warning('Could not refresh learner email before offer notification for %s: %s',a['id'],exc)
-        profile=profiles[0] if profiles else {}
         offer_id='SKAI-OL-'+str(a['verification_id']).replace('-','').upper()
         offer_url=SITE_URL+'/offer/'+a['track_slug']
         try:
             await asyncio.to_thread(
                 send_offer_email,
-                recipient=(profile.get('email') or '').strip(),
+                recipient=(a.get('email') or '').strip(),
                 student_name=a['student_name'],
                 track_name=t['title'],
                 offer_id=offer_id,
@@ -276,15 +276,9 @@ async def platform(request:Request):
         if email_type == 'internship' and a['status'] != 'approved':
             raise HTTPException(409, 'An active approved internship is required to send a reminder email.')
         t = await database('tracks', params={'slug':'eq.'+a['track_slug']}, one=True)
-        profiles = await database('profiles', params={'id':'eq.'+a['user_id'], 'select':'email'})
-        if not profiles or not (profiles[0].get('email') or '').strip():
-            try:
-                await asyncio.to_thread(sync_directory, True)
-                profiles = await database('profiles', params={'id':'eq.'+a['user_id'], 'select':'email'})
-            except (HTTPException, OSError, ValueError, httpx.HTTPError) as exc:
-                logging.warning('Could not refresh learner email before manual send for %s: %s', a['id'], exc)
-        profile = profiles[0] if profiles else {}
-        recipient = (profile.get('email') or '').strip()
+        recipient = str(b.get('email') or a.get('email') or '').strip()
+        if recipient and recipient != (a.get('email') or '').strip():
+            await database('applications','PATCH',params={'id':'eq.'+a['id']},body={'email':recipient})
         try:
             if email_type == 'offer':
                 offer_id = 'SKAI-OL-' + str(a['verification_id']).replace('-','').upper()
@@ -356,18 +350,10 @@ async def platform(request:Request):
         certificate=await database('rpc/issue_certificate','POST',body={'app_id':a['id']},one=True)
         email_status={'sent':False,'skipped':bool(existing)}
         if not existing:
-            profiles=await database('profiles',params={'id':'eq.'+a['user_id'],'select':'email'})
-            if not profiles or not (profiles[0].get('email') or '').strip():
-                try:
-                    await asyncio.to_thread(sync_directory, True)
-                    profiles=await database('profiles',params={'id':'eq.'+a['user_id'],'select':'email'})
-                except (HTTPException, OSError, ValueError, httpx.HTTPError) as exc:
-                    logging.warning('Could not refresh learner email before certificate notification for %s: %s',a['id'],exc)
-            profile=profiles[0] if profiles else {}
             try:
                 await asyncio.to_thread(
                     send_certificate_email,
-                    recipient=(profile.get('email') or '').strip(),
+                    recipient=(a.get('email') or '').strip(),
                     student_name=certificate.get('student_name') or a['student_name'],
                     track_name=certificate.get('track_title') or 'internship',
                     certificate_id=certificate['id'],

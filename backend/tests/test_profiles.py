@@ -18,7 +18,7 @@ class ProfileTests(unittest.TestCase):
             ProfileInput(name='Alex Morgan', occupation='admin')
 
     def test_motivation_maximum_15_words(self):
-        body = dict(name='Alex Morgan', occupation='other', track_slug='python', start_date='2099-01-01')
+        body = dict(name='Alex Morgan', email='alex@example.com', occupation='other', track_slug='python', start_date='2099-01-01')
         for reason in ['Learn', ' '.join(['learn'] * 15), '\n'.join(['learn'] * 15)]:
             ApplicationInput(**body, motivation=reason)
         for reason in ['', '   ', ' '.join(['learn'] * 16)]:
@@ -45,7 +45,7 @@ class ProfileTests(unittest.TestCase):
         for occupation in ['employee', 'other']:
             database.reset_mock()
             response = TestClient(app).post('/api/platform', json={
-                'action':'apply', 'name':'New Name', 'occupation':occupation,
+                'action':'apply', 'name':'New Name', 'email':'new@example.com', 'occupation':occupation,
                 'company':'Example', 'college':'Old College', 'motivation':'Build practical skills',
                 'track_slug':'python', 'start_date':'2099-01-01'})
             self.assertEqual(response.status_code, 200, response.text)

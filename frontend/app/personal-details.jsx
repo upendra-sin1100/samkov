@@ -19,7 +19,7 @@ export function personalData(form) {
     return { name: String(form.get('name') || '').trim(), occupation: String(form.get('occupation') || ''), college: String(form.get('college') || '').trim(), company: String(form.get('company') || '').trim() };
 }
 
-export function EnrollmentForm({ initial, busy, onSubmit }) {
+export function EnrollmentForm({ initial, email, busy, onSubmit }) {
     const [motivation, setMotivation] = useState('');
     const words = motivation.trim().split(/\s+/u).filter(Boolean).length;
     const today = new Date();
@@ -27,6 +27,7 @@ export function EnrollmentForm({ initial, busy, onSubmit }) {
     return <form className="panel form-panel" onSubmit={e => { e.preventDefault(); if (words > 15) return; onSubmit(new FormData(e.currentTarget)); }}>
         <div className="personal-form-heading"><UserRound size={22}/><div><h2>A little about you</h2><p>Tell us where you are in your journey.</p></div></div>
         <PersonalFields initial={initial}/>
+        <label>Email for program updates<input type="email" name="email" required maxLength={320} defaultValue={email || ''} placeholder="you@example.com"/></label>
         <label>Preferred start date<input type="date" name="start" required min={minimumDate}/></label>
         <label>Why would you like to join?<textarea name="motivation" required maxLength={1500} value={motivation} aria-describedby="motivation-count" aria-invalid={words > 15} onChange={e => { setMotivation(e.target.value); e.target.setCustomValidity(e.target.value.trim().split(/\s+/u).filter(Boolean).length > 15 ? 'Please use 15 words or fewer.' : ''); }} placeholder="Share what you want to learn or build."/></label>
         <small id="motivation-count" className={'word-count' + (words > 15 ? ' over-limit' : '')} aria-live="polite">{words} / 15 words · Maximum 15 words</small>
