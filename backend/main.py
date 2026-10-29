@@ -28,7 +28,7 @@ app.add_middleware(CORSMiddleware, allow_origins=[SITE_URL], allow_methods=['GET
 
 from .db import database, record_visit, touch_user, analytics_snapshot
 from .auth import identity
-from .directory import request_directory_sync
+from .directory import request_directory_sync, sync_directory
 from . import files
 from .email import EmailConfigurationError, EmailDeliveryError, send_offer_email
 
@@ -242,6 +242,12 @@ async def platform(request:Request):
         await database('applications','PATCH',params={'id':'eq.'+a['id'],'status':'eq.pending'},body={'status':'approved','end_date':str(end),'authorized_signatory':signatory})
         email_status={'sent':False}
         profiles=await database('profiles',params={'id':'eq.'+a['user_id'],'select':'email'})
+        if not profiles or not (profiles[0].get('email') or '').strip():
+            try:
+                await asyncio.to_thread(sync_directory, True)
+                profiles=await database('profiles',params={'id':'eq.'+a['user_id'],'select':'email'})
+            except (HTTPException, OSError, ValueError, httpx.HTTPError) as exc:
+                logging.warning('Could not refresh learner email before offer notification for %s: %s',a['id'],exc)
         profile=profiles[0] if profiles else {}
         offer_id='SKAI-OL-'+str(a['verification_id']).replace('-','').upper()
         offer_url=SITE_URL+'/offer/'+a['track_slug']
