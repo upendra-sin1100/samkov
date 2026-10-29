@@ -220,18 +220,18 @@
 
 /* Compact offer layout: footer pinned to the bottom, with room above the frame */
 .pdf-capture.program-offer{width:794px!important;height:auto!important;min-height:1123px!important;padding:26px 40px 36px!important}
-.pdf-capture.program-offer>p{margin:0 0 8px!important;font-size:11px!important;line-height:1.45!important}
+.pdf-capture.program-offer>p{margin:0 0 8px!important;font-size:12px!important;line-height:1.45!important}
 .pdf-capture.program-offer .document-border{inset:8px!important}
 .pdf-capture.program-offer .program-doc-header{min-height:64px!important;margin-bottom:6px!important}
 .pdf-capture.program-offer .samkov-symbol{height:56px!important;width:32px!important}
 .pdf-capture.program-offer .samkov-wordmark strong{font-size:24px!important}
 .pdf-capture.program-offer .program-doc-title{margin:10px 0!important}
-.pdf-capture.program-offer .program-doc-title h2{font-size:40px!important;margin:6px 0 4px!important}
+.pdf-capture.program-offer .program-doc-title h2{font-size:46px!important;margin:6px 0 4px!important}
 .pdf-capture.program-offer .program-doc-title:after{margin-top:10px!important}
 .pdf-capture.program-offer .offer-reference{margin:12px 0!important;padding:7px 0!important}
-.pdf-capture.program-offer>h3{font-size:11px!important;margin:12px 0 5px!important}
+.pdf-capture.program-offer>h3{font-size:11px!important;margin:18px 0 6px!important}
 .pdf-capture.program-offer ul{margin:4px 0 8px!important}
-.pdf-capture.program-offer li{font-size:11px!important;line-height:1.45!important;margin-bottom:0!important}
+.pdf-capture.program-offer li{font-size:12px!important;line-height:1.45!important;margin-bottom:0!important}
 .pdf-capture.program-offer .offer-facts{margin:12px 0!important;padding:12px 14px!important;gap:12px 14px!important}
 .pdf-capture.program-offer .offer-facts svg{width:18px!important;height:18px!important}
 .pdf-capture.program-offer dt{font-size:8px!important}
