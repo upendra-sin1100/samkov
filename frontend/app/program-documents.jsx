@@ -72,7 +72,36 @@ export function CertificateDocument({ certificate: c }) {
     </article>;
 }
 export function PrintDocumentButton() {
-    return <button className="secondary space-top" onClick={() => window.print()}><Download size={17}/>Print / Save PDF</button>;
+    const [busy, setBusy] = useState(false), [error, setError] = useState('');
+    async function download() {
+        const documentElement = window.document.querySelector('.program-document');
+        if (!documentElement || busy)
+            return;
+        setBusy(true);
+        setError('');
+        documentElement.classList.add('document-download-mode');
+        try {
+            const { default: html2pdf } = await import('html2pdf.js');
+            const certificate = documentElement.classList.contains('program-certificate');
+            await html2pdf().set({
+                margin: 0,
+                filename: certificate ? 'samkovai-certificate.pdf' : 'samkovai-offer-letter.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: certificate ? 'landscape' : 'portrait' },
+                pagebreak: { mode: ['avoid-all'] }
+            }).from(documentElement).save();
+        }
+        catch (downloadError) {
+            console.error('Document PDF download failed.', downloadError);
+            setError('PDF download failed. Please try again.');
+        }
+        finally {
+            documentElement.classList.remove('document-download-mode');
+            setBusy(false);
+        }
+    }
+    return <><button className="secondary space-top" disabled={busy} onClick={download}><Download size={17}/>{busy ? 'Preparing PDF…' : 'Download PDF'}</button>{error && <p className="document-download-error" role="alert">{error}</p>}</>;
 }
 export function VerificationPanel({ document, checked, error, id, go }) {
     const isOffer = document?.type === 'offer';
