@@ -19,7 +19,18 @@ function BrandMark({ className }) {
     return <svg className={className} viewBox="0 0 80 145" aria-hidden="true"><path fill="currentColor" d="M70 2 4 52v25l39 28-39 29v10l65-46-44-32 45-34Z"/><path fill="#ff681f" d="m49 50 27 20v23L36 62Z"/></svg>;
 }
 function DocumentArt() {
-    return <div className="document-art" aria-hidden="true"><div className="document-border"/><i className="document-corner corner-top"/><i className="document-corner corner-bottom"/><BrandMark className="document-watermark"/></div>;
+    return <div className="document-art" aria-hidden="true">
+        <div className="document-border"/>
+        <svg className="document-corner corner-top" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <polygon points="0,0 70,0 0,70" fill="#f25d13"/>
+            <polygon points="70,0 100,0 0,100 0,70" fill="#161c23"/>
+        </svg>
+        <svg className="document-corner corner-bottom" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <polygon points="100,100 30,100 100,30" fill="#f25d13"/>
+            <polygon points="30,100 0,100 100,0 100,30" fill="#161c23"/>
+        </svg>
+        <BrandMark className="document-watermark"/>
+    </div>;
 }
 function DocumentSeal() {
     const sealId = useId();
@@ -74,30 +85,38 @@ export function CertificateDocument({ certificate: c }) {
 export function PrintDocumentButton() {
     const [busy, setBusy] = useState(false), [error, setError] = useState('');
     async function download() {
-        const documentElement = window.document.querySelector('.program-document');
-        if (!documentElement || busy)
+        const source = window.document.querySelector('.program-document');
+        if (!source || busy)
             return;
         setBusy(true);
         setError('');
-        documentElement.classList.add('document-download-mode');
+        let stage;
         try {
-            const { default: html2pdf } = await import('html2pdf.js');
-            const certificate = documentElement.classList.contains('program-certificate');
-            await html2pdf().set({
-                margin: 0,
-                filename: certificate ? 'samkovai-certificate.pdf' : 'samkovai-offer-letter.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: certificate ? 'landscape' : 'portrait' },
-                pagebreak: { mode: ['avoid-all'] }
-            }).from(documentElement).save();
+            await window.document.fonts?.ready;
+            const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import('html2canvas'), import('jspdf')]);
+            const certificate = source.classList.contains('program-certificate');
+            const pageW = certificate ? 297 : 210, pageH = certificate ? 210 : 297;
+            const clone = source.cloneNode(true);
+            clone.classList.add('document-download-mode');
+            clone.style.margin = '0';
+            stage = window.document.createElement('div');
+            stage.style.cssText = `position:fixed;left:0;top:0;width:${pageW}mm;height:${pageH}mm;overflow:hidden;z-index:-1;pointer-events:none;background:#fff`;
+            stage.appendChild(clone);
+            window.document.body.appendChild(stage);
+            const canvas = await html2canvas(clone, {
+                scale: 2, useCORS: true, backgroundColor: '#ffffff',
+                windowWidth: 1280, scrollX: 0, scrollY: 0,
+            });
+            const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: certificate ? 'landscape' : 'portrait' });
+            pdf.addImage(canvas.toDataURL('image/jpeg', 0.98), 'JPEG', 0, 0, pageW, pageH);
+            pdf.save(certificate ? 'samkovai-certificate.pdf' : 'samkovai-offer-letter.pdf');
         }
         catch (downloadError) {
             console.error('Document PDF download failed.', downloadError);
             setError('PDF download failed. Please try again.');
         }
         finally {
-            documentElement.classList.remove('document-download-mode');
+            stage?.remove();
             setBusy(false);
         }
     }
