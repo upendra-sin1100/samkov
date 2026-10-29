@@ -210,3 +210,14 @@
 .pdf-capture{box-sizing:border-box!important;overflow:hidden!important;margin:0!important;max-width:none!important;box-shadow:none!important;display:flex!important;flex-direction:column}
 .pdf-capture.program-offer{width:794px!important;height:1123px!important}
 .pdf-capture .program-doc-footer{margin-top:auto!important}
+
+/* Corners are SVG now: remove old clip-path/gradient/rotate */
+.document-corner{background:none!important;clip-path:none!important;transform:none!important}
+.document-corner:after{display:none!important}
+.corner-top{width:110px!important;height:110px!important}
+.corner-bottom{width:90px!important;height:90px!important}
+
+/* PDF capture for the offer letter (A4 portrait at 96dpi) */
+.pdf-capture{box-sizing:border-box!important;overflow:hidden!important;margin:0!important;max-width:none!important;box-shadow:none!important;display:flex!important;flex-direction:column}
+.pdf-capture.program-offer{width:794px!important;height:1123px!important}
+.pdf-capture .program-doc-footer{margin-top:auto!important}
