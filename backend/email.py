@@ -9,6 +9,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 logger = logging.getLogger(__name__)
+LINKEDIN_URL = 'https://www.linkedin.com/company/samkovai/'
 
 
 class EmailConfigurationError(RuntimeError):
@@ -109,6 +110,9 @@ View your offer letter:
 
 Offer ID: {offer_id}
 
+Share your offer letter on LinkedIn if you would like to celebrate your opportunity, and tag @SamkovAI:
+{LINKEDIN_URL}
+
 SamkovAI Program Office
 """
     )
@@ -168,6 +172,9 @@ View your certificate:
 {certificate_url}
 
 Certificate ID: {certificate_id}
+
+Share your certificate on LinkedIn if you would like to celebrate your achievement, and tag @SamkovAI:
+{LINKEDIN_URL}
 
 SamkovAI Program Office
 """
